@@ -55,9 +55,16 @@ const prompt = ai.definePrompt({
   },
   prompt: `You are a medical AI assistant specializing in analyzing kidney CT scans. Analyze the provided CT scan image and predict the kidney condition.
 
+  Consider the following characteristics when determining the condition:
+
+  - Cyst: Usually round or oval-shaped, with smooth borders and fluid-filled appearance.
+  - Tumor: Irregular shape, may have solid components, and can distort the kidney's normal structure.
+  - Stone: High density, appears very bright on the CT scan, and has a well-defined shape.
+  - Normal: Kidney appears healthy with no abnormalities.
+
   Return the predicted condition as one of the following values: cyst, tumor, stone, normal.
   Also, return a confidence level between 0 and 1 for your prediction.
-  Also, generate some relevant analytics based on the CT scan image.
+  Also, generate some relevant analytics based on the CT scan image, including size, location, and any other notable features.
 
   CT Scan Image: {{media url=ctScanUrl}}
   `, 
