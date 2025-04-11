@@ -8,7 +8,7 @@ import {analyzeCTScan} from '@/ai/flows/analyze-ct-scan';
 import {Badge} from '@/components/ui/badge';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {useEffect} from 'react';
-import {ReloadIcon} from 'lucide-react';
+import {RedoIcon} from 'lucide-react';
 
 const DISCLAIMER =
   'This AI analysis is for informational purposes only and should not be considered a substitute for professional medical advice. Consult with a qualified healthcare provider for diagnosis and treatment.';
@@ -100,7 +100,7 @@ export default function Home() {
             {isLoading ? (
               <>
                 Analyzing...
-                <ReloadIcon className="ml-2 h-4 w-4 animate-spin" />
+                <RedoIcon className="ml-2 h-4 w-4 animate-spin" />
               </>
             ) : (
               'Analyze CT Scan'
@@ -134,3 +134,4 @@ export default function Home() {
     </div>
   );
 }
+
