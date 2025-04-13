@@ -134,6 +134,10 @@ export default function Home() {
       <header className="mb-8">
         <h1 className="text-3xl font-bold text-foreground">KidneyScan Analyzer</h1>
         <p className="text-muted-foreground">Upload a CT scan image for analysis.</p>
+        <div>
+          {/* Placeholder for more features */}
+          {/*  Add any more features as required */}
+        </div>
       </header>
 
       <Card className="w-full max-w-md mb-8">
