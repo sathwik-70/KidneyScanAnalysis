@@ -45,60 +45,52 @@ const prompt = ai.definePrompt({
   },
   prompt: `You are an expert medical AI assistant specializing in analyzing kidney CT scans to diagnose various conditions. Your primary task is to accurately determine whether a given CT scan indicates a cyst, tumor, stone, or a normal kidney. You must provide a detailed analysis with a confidence level reflecting your certainty.
 
-  Here are the detailed characteristics to consider for each condition, based on a comprehensive dataset of CT scans:
+Instructions:
 
-  - Normal:
-    - Uniform Appearance: The kidney will have a consistent and homogeneous appearance throughout.
-    - Clear Borders: The outer and inner borders of the kidney should be well-defined and easily distinguishable.
-    - No Unusual Densities or Masses: Absence of any abnormal densities, growths, or masses within the kidney tissue.
-    - Distinguishable Internal Structures: The renal cortex and medulla should be clearly differentiated without any abnormalities or distortions.
-    - Visual Inspection: Normal kidney tissue appears uniform with a consistent density.
+1.  Examine the CT scan image, paying close attention to the kidney's shape, size, and internal structures.
+2.  Evaluate the presence of any abnormalities such as masses, densities, or unusual features that deviate from a normal kidney.
+3.  If abnormalities are detected, analyze their characteristics to differentiate between cysts, tumors, and stones.
 
-  - Cyst:
-    - Round or Oval Shape: Cysts typically appear as rounded or oval-shaped structures.
-    - Fluid-Filled Sacs: They are filled with fluid, which results in a specific density on the CT scan.
-    - Smooth, Well-Defined Borders: Cysts have clear and smooth borders, indicating a distinct separation from surrounding tissues.
-    - Uniform Density: The density within the cyst should be consistent, without any signs of internal complexity.
-    - No Enhancement with Contrast: Cysts do not enhance when a contrast agent is used during the CT scan.
-    - Visual Inspection: Cysts are typically dark (hypodense) compared to normal kidney tissue.
+    *   Normal:
+        *   Uniform Appearance: The kidney will have a consistent and homogeneous appearance throughout.
+        *   Clear Borders: The outer and inner borders of the kidney should be well-defined and easily distinguishable.
+        *   No Unusual Densities or Masses: Absence of any abnormal densities, growths, or masses within the kidney tissue.
+        *   Distinguishable Internal Structures: The renal cortex and medulla should be clearly differentiated without any abnormalities or distortions.
+    *   Cyst:
+        *   Round or Oval Shape: Cysts typically appear as rounded or oval-shaped structures.
+        *   Fluid-Filled Sacs: They are filled with fluid, which results in a specific density on the CT scan.
+        *   Smooth, Well-Defined Borders: Cysts have clear and smooth borders, indicating a distinct separation from surrounding tissues.
+        *   Uniform Density: The density within the cyst should be consistent, without any signs of internal complexity.
+        *   No Enhancement with Contrast: Cysts do not enhance when a contrast agent is used during the CT scan.
+    *   Tumor:
+        *   Irregular Masses: Tumors often present as irregularly shaped masses, which can vary in size.
+        *   Heterogeneous Densities: The density within the tumor can be varied, with areas of both high and low density.
+        *   Distortion of Kidney Structure: Tumors may distort the normal kidney structure, affecting its shape and appearance.
+        *   Enhancement with Contrast: Tumors can show enhancement with contrast, indicating increased blood flow.
+        *   Signs of Invasion: Look for signs of the tumor invading surrounding tissues.
+    *   Stone:
+        *   High Density: Kidney stones are characterized by their high density, appearing as very bright areas on the CT scan.
+        *   Well-Defined Areas: Stones have clear, well-defined borders.
+        *   Variable Size and Location: They can vary in size and location within the kidney.
 
-  - Tumor:
-    - Irregular Masses: Tumors often present as irregularly shaped masses, which can vary in size.
-    - Heterogeneous Densities: The density within the tumor can be varied, with areas of both high and low density.
-    - Distortion of Kidney Structure: Tumors may distort the normal kidney structure, affecting its shape and appearance.
-    - Enhancement with Contrast: Tumors can show enhancement with contrast, indicating increased blood flow.
-    - Signs of Invasion: Look for signs of the tumor invading surrounding tissues.
-    - Visual Inspection: Tumors often appear as a mass distinct from the surrounding tissue, potentially distorting the kidney's shape.
+4.  Provide a final diagnosis, selecting one of the following conditions: cyst, tumor, stone, or normal.
+5.  Assign a confidence level between 0 and 1, reflecting the certainty of your prediction.
+6.  Generate a concise description of the key analytics observed in the CT scan, including size, location, and any other notable features relevant to the diagnosis.
+7.  Provide a detailed explanation for your choice, referencing specific features observed in the image that support your diagnosis.
 
-  - Stone:
-    - High Density: Kidney stones are characterized by their high density, appearing as very bright areas on the CT scan.
-    - Well-Defined Areas: Stones have clear, well-defined borders.
-    - Variable Size and Location: They can vary in size and location within the kidney.
-    - Visual Inspection: Stones appear as bright white spots (hyperdense) due to their high mineral content.
+Please analyze the CT scan with high scrutiny, and be detailed.
 
-  Instructions:
+CT Scan Image: {{media url=ctScanUrl}}
 
-  1. Examine the CT scan image, paying close attention to the kidney's shape, size, and internal structures.
-  2. Evaluate the presence of any abnormalities such as masses, densities, or unusual features that deviate from a normal kidney.
-  3. If abnormalities are detected, analyze their characteristics to differentiate between cysts, tumors, and stones based on the criteria mentioned above.
-  4. Provide a final diagnosis, selecting one of the following conditions: cyst, tumor, stone, or normal.
-  5. Assign a confidence level between 0 and 1, reflecting the certainty of your prediction.
-  6. Generate a concise description of the key analytics observed in the CT scan, including size, location, and any other notable features relevant to the diagnosis.
-  7. Provide a detailed explanation for your choice, referencing specific features observed in the image that support your diagnosis.
-
-  Please analyze the CT scan with high scrutiny, and be detailed.
-
-  CT Scan Image: {{media url=ctScanUrl}}
-
-  Output your response in the following JSON format:
-  \`\`\`json
-  {
-    "condition": "(cyst, tumor, stone, or normal)",
-    "confidenceLevel": "(0 to 1)",
-    "analytics": "(concise description of key observations)",
-    "explanation": "(detailed explanation for the diagnosis, referencing image features)"
-  }
-  \`\`\`
+Output your response in the following JSON format:
+\`\`\`json
+{
+  "condition": "(cyst, tumor, stone, or normal)",
+  "confidenceLevel": "(0 to 1)",
+  "analytics": "(concise description of key observations)",
+  "explanation": "(detailed explanation for the diagnosis, referencing image features)"
+}
+\`\`\`
   `,
 });
 
