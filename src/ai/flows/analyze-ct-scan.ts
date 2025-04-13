@@ -94,7 +94,7 @@ Instructions:
         *   No Enlargement or Swelling: There should be no enlargement or swelling of the kidney. The size should be within normal physiological limits.
         *   Absence of Masses or Growths: There should be no visible masses, growths, or unusual densities within the kidney tissue.
         *   No Hydronephrosis: Ensure there is no swelling or enlargement of the kidney due to urine buildup. The collecting system should appear normal and not dilated.
-        *   Consistent Density: The density of the kidney tissue should be consistent throughout, without any signs of abnormal areas.
+        *   Consistent Density: The density of the kidney tissue should be consistent throughout, without any signs of abnormal areas. Specifically confirm the presence of all the characteristics of a normal kidney and the absence of the characteristics of cysts, tumors, and stones. Positively affirm the kidney's health by stating that no abnormalities are detected and that all structures appear normal.
     *   Cyst:
         *   Round or Oval Shape: Cysts typically appear as rounded or oval-shaped structures.
         *   Fluid-Filled Sacs: They are filled with fluid, which results in a specific density on the CT scan.
@@ -114,7 +114,7 @@ Instructions:
 
 5.  For a normal kidney, ensure that the analysis specifically confirms the presence of all the characteristics of a normal kidney and the absence of the characteristics of cysts, tumors, and stones. The analysis should positively affirm the kidney's health by stating that no abnormalities are detected and that all structures appear normal.
 6.  Provide a final diagnosis, selecting one of the following conditions: cyst, tumor, stone, or normal.
-7.  Assign a confidence level between 0 and 1, reflecting the certainty of your prediction. Ensure that this level corresponds appropriately to the clarity and distinctiveness of the features observed in the scan.
+7.  Assign a confidence level between 0 and 1, reflecting the certainty of your prediction. Ensure that this level corresponds appropriately to the clarity and distinctiveness of the features observed in the scan. The value MUST be a number.
 8.  Generate a concise description of the key analytics observed in the CT scan, including size, location, and any other notable features relevant to the diagnosis.
 9.  Provide a detailed explanation for your choice, referencing specific features observed in the image that support your diagnosis. Use the analysis from the analyzeCTScanForImageAnalysis tool in your explanation.
 
@@ -176,5 +176,3 @@ const analyzeCTScanFlow = ai.defineFlow<
     }
   }
 );
-
-    
