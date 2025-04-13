@@ -151,14 +151,16 @@ const analyzeCTScanFlow = ai.defineFlow<
       const parsedOutput = AnalyzeCTScanOutputSchema.safeParse(output);
       if (!parsedOutput.success) {
         console.error('Output validation error:', parsedOutput.error);
-        throw new Error('Failed to validate the model output. Please check the model configuration.');
+        throw parsedOutput.error; // Re-throw the ZodError for better debugging
       }
 
       console.log('Model Output:', parsedOutput.data);
       return parsedOutput.data;
     } catch (error) {
       console.error('Error analyzing CT scan:', error);
-      throw new Error('Failed to analyze CT scan. Please ensure the CT scan URL is valid and try again.');
+      throw error; // Re-throw the original error for accurate error reporting
     }
   }
 );
+
+    
