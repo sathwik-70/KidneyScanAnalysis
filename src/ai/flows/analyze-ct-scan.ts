@@ -52,10 +52,11 @@ Instructions:
 3.  If abnormalities are detected, analyze their characteristics to differentiate between cysts, tumors, and stones.
 
     *   Normal:
-        *   Uniform Appearance: The kidney will have a consistent and homogeneous appearance throughout.
+        *   Uniform Appearance: The kidney will have a consistent and homogeneous appearance throughout.  Pay close attention to ensure there is a clear and consistent renal cortex and medulla.
         *   Clear Borders: The outer and inner borders of the kidney should be well-defined and easily distinguishable.
         *   No Unusual Densities or Masses: Absence of any abnormal densities, growths, or masses within the kidney tissue.
         *   Distinguishable Internal Structures: The renal cortex and medulla should be clearly differentiated without any abnormalities or distortions.
+        *   No Hydronephrosis: Ensure there is no swelling or enlargement of the kidney due to urine buildup. The collecting system should appear normal and not dilated.
     *   Cyst:
         *   Round or Oval Shape: Cysts typically appear as rounded or oval-shaped structures.
         *   Fluid-Filled Sacs: They are filled with fluid, which results in a specific density on the CT scan.
