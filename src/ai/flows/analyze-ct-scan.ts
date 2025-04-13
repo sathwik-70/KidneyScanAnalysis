@@ -73,10 +73,11 @@ Instructions:
         *   Well-Defined Areas: Stones have clear, well-defined borders.
         *   Variable Size and Location: They can vary in size and location within the kidney.
 
-4.  Provide a final diagnosis, selecting one of the following conditions: cyst, tumor, stone, or normal.
-5.  Assign a confidence level between 0 and 1, reflecting the certainty of your prediction.
-6.  Generate a concise description of the key analytics observed in the CT scan, including size, location, and any other notable features relevant to the diagnosis.
-7.  Provide a detailed explanation for your choice, referencing specific features observed in the image that support your diagnosis.
+4.  For a normal kidney, ensure that the analysis specifically confirms the absence of the characteristics of cysts, tumors, and stones. The analysis should positively affirm the kidney's health by stating that no abnormalities are detected and that all structures appear normal.
+5.  Provide a final diagnosis, selecting one of the following conditions: cyst, tumor, stone, or normal.
+6.  Assign a confidence level between 0 and 1, reflecting the certainty of your prediction.
+7.  Generate a concise description of the key analytics observed in the CT scan, including size, location, and any other notable features relevant to the diagnosis.
+8.  Provide a detailed explanation for your choice, referencing specific features observed in the image that support your diagnosis.
 
 Please analyze the CT scan with high scrutiny, and be detailed.
 

@@ -20,6 +20,7 @@ export default function Home() {
         condition: 'cyst' | 'tumor' | 'stone' | 'normal';
         confidenceLevel: number;
         analytics: string;
+        explanation: string;
       }
     | undefined
   >(undefined);
@@ -122,9 +123,19 @@ export default function Home() {
             </div>
             <div>Confidence Level: {(prediction.confidenceLevel * 100).toFixed(2)}%</div>
             <div>Analytics: {prediction.analytics}</div>
+             <div>Explanation: {prediction.explanation}</div>
             {highlightedArea && <div>Visual Highlighting: {highlightedArea}</div>}
           </CardContent>
         </Card>
+      )}
+
+       {prediction && prediction.confidenceLevel < 0.6 && (
+        <Alert variant="warning" className="w-full max-w-md">
+          <AlertTitle>Low Confidence</AlertTitle>
+          <AlertDescription>
+            The AI analysis has a low confidence level. Please consult with a qualified healthcare provider for diagnosis and treatment.
+          </AlertDescription>
+        </Alert>
       )}
 
       <Alert className="w-full max-w-md">
