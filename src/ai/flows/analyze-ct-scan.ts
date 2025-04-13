@@ -32,31 +32,8 @@ export async function analyzeCTScan(input: AnalyzeCTScanInput): Promise<AnalyzeC
   return analyzeCTScanFlow(input);
 }
 
-const getMedicalInformation = ai.defineTool({
-  name: 'getMedicalInformation',
-  description: 'Retrieves medical information about kidney conditions based on keywords.',
-  inputSchema: z.object({
-    keywords: z.string().describe('Keywords related to kidney conditions (e.g., cyst, tumor, stone).'),
-  }),
-  outputSchema: z.string().describe('Relevant medical information about the kidney condition.'),
-}, async input => {
-  // Simulate fetching medical information from a database or API.
-  // In a real-world scenario, this would involve querying a medical database.
-  const {keywords} = input;
-  if (keywords.includes('cyst')) {
-    return 'Kidney cysts are round or oval-shaped sacs filled with fluid that form on the kidneys.';
-  } else if (keywords.includes('tumor')) {
-    return 'Kidney tumors are abnormal growths that can be benign or malignant.';
-  } else if (keywords.includes('stone')) {
-    return 'Kidney stones are hard deposits made of minerals and salts that form inside the kidneys.';
-  } else {
-    return 'No specific information found.';
-  }
-});
-
 const prompt = ai.definePrompt({
   name: 'analyzeCTScanPrompt',
-  tools: [getMedicalInformation],
   input: {
     schema: z.object({
       ctScanUrl: z.string().describe('The URL of the kidney CT scan image.'),
@@ -107,34 +84,7 @@ const analyzeCTScanFlow = ai.defineFlow<
     outputSchema: AnalyzeCTScanOutputSchema,
   },
   async input => {
-    const {ctScanUrl} = input;
-
-    // Mock analysis result based on URL content.  This would be replaced by an
-    // actual image analysis service.
-    let predictedCondition: 'cyst' | 'tumor' | 'stone' | 'normal' = 'normal';
-    let confidenceLevel = 0.75;
-    let analytics = 'No significant abnormalities detected.';
-
-    if (ctScanUrl.includes('cyst')) {
-      predictedCondition = 'cyst';
-      confidenceLevel = 0.8;
-      analytics = 'Round, fluid-filled sac detected.';
-    } else if (ctScanUrl.includes('tumor')) {
-      predictedCondition = 'tumor';
-      confidenceLevel = 0.85;
-      analytics = 'Irregular mass with heterogeneous densities.';
-    } else if (ctScanUrl.includes('stone')) {
-      predictedCondition = 'stone';
-      confidenceLevel = 0.9;
-      analytics = 'High-density deposit detected within the kidney.';
-    }
-
-    //This code is added just as a default setting of the AI and can be changed based on the AI response
-    const {output} = await prompt({ctScanUrl});
-    return {
-      condition: predictedCondition,
-      confidenceLevel: confidenceLevel,
-      analytics: analytics,
-    }
+    const {output} = await prompt(input);
+    return output!;
   }
 );
