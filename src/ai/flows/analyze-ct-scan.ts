@@ -126,7 +126,7 @@ Output your response in the following JSON format:
 \`\`\`json
 {
   "condition": "(cyst, tumor, stone, or normal)",
-  "confidenceLevel": "(0 to 1)",
+  "confidenceLevel": "(numerical value between 0 and 1)",
   "analytics": "(concise description of key observations)",
   "explanation": "(detailed explanation for the diagnosis, referencing image features and insights from analyzeCTScanForImageAnalysis)"
 }
@@ -154,13 +154,25 @@ const analyzeCTScanFlow = ai.defineFlow<
         throw parsedOutput.error; // Re-throw the ZodError for better debugging
       }
 
-      console.log('Model Output:', parsedOutput.data);
-      return parsedOutput.data;
+      // Ensure confidenceLevel is parsed as a number
+      const confidenceLevel = typeof parsedOutput.data.confidenceLevel === 'string'
+        ? parseFloat(parsedOutput.data.confidenceLevel)
+        : parsedOutput.data.confidenceLevel;
+
+      if (isNaN(confidenceLevel)) {
+        throw new Error('Confidence level is not a valid number.');
+      }
+
+      const result: AnalyzeCTScanOutput = {
+        ...parsedOutput.data,
+        confidenceLevel: confidenceLevel,
+      };
+
+      console.log('Model Output:', result);
+      return result;
     } catch (error) {
       console.error('Error analyzing CT scan:', error);
       throw error; // Re-throw the original error for accurate error reporting
     }
   }
 );
-
-    
