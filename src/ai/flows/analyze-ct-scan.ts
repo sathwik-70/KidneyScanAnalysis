@@ -25,6 +25,7 @@ const AnalyzeCTScanOutputSchema = z.object({
     .max(1)
     .describe('The confidence level of the prediction (0 to 1).'),
   analytics: z.string().describe('Analytics based on the CT scan image'),
+  explanation: z.string().describe('Explanation of why the model chose the predicted condition.'),
 });
 export type AnalyzeCTScanOutput = z.infer<typeof AnalyzeCTScanOutputSchema>;
 
@@ -40,21 +41,11 @@ const prompt = ai.definePrompt({
     }),
   },
   output: {
-    schema: z.object({
-      condition: z
-        .enum(['cyst', 'tumor', 'stone', 'normal'])
-        .describe('The predicted kidney condition.'),
-      confidenceLevel: z
-        .number()
-        .min(0)
-        .max(1)
-        .describe('The confidence level of the prediction (0 to 1).'),
-      analytics: z.string().describe('Analytics based on the CT scan image'),
-    }),
+    schema: AnalyzeCTScanOutputSchema,
   },
   prompt: `You are a highly specialized medical AI assistant, adept at analyzing kidney CT scans to identify various conditions. Your primary task is to accurately determine whether a given CT scan indicates a cyst, tumor, stone, or a normal kidney.
 
-  Here are the key characteristics to consider for each condition:
+  Here are the key characteristics to consider for each condition, based on a dataset of CT scans:
 
   - Normal: The kidney will have a uniform appearance, clear borders, and no unusual densities or masses. The internal structures, such as the renal cortex and medulla, will be clearly distinguishable without any abnormalities. Visual inspection: Normal kidney tissue appears homogeneous with a consistent density.
   - Cyst: Cysts typically appear as round or oval-shaped, fluid-filled sacs with smooth, well-defined borders. They usually have a uniform density and do not enhance with contrast. Visual inspection: Cysts are typically dark (hypodense) compared to normal kidney tissue.
@@ -69,13 +60,21 @@ const prompt = ai.definePrompt({
   4. Provide a final diagnosis, selecting one of the following conditions: cyst, tumor, stone, or normal.
   5. Assign a confidence level between 0 and 1, reflecting the certainty of your prediction.
   6. Generate a concise description of the key analytics observed in the CT scan, including size, location, and any other notable features relevant to the diagnosis.
+  7. Provide a detailed explanation for your choice, referencing specific features observed in the image that support your diagnosis.
+
+  Please analyze the CT scan with high scrutiny, and be detailed.
 
   CT Scan Image: {{media url=ctScanUrl}}
 
-  Output your response in the following format:
-  - Condition: (cyst, tumor, stone, or normal)
-  - Confidence Level: (0 to 1)
-  - Analytics: (concise description of key observations)
+  Output your response in the following JSON format:
+  \`\`\`json
+  {
+    "condition": "(cyst, tumor, stone, or normal)",
+    "confidenceLevel": "(0 to 1)",
+    "analytics": "(concise description of key observations)",
+    "explanation": "(detailed explanation for the diagnosis, referencing image features)"
+  }
+  \`\`\`
   `,
 });
 
@@ -89,7 +88,21 @@ const analyzeCTScanFlow = ai.defineFlow<
     outputSchema: AnalyzeCTScanOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    try {
+      const {output} = await prompt(input);
+
+      // Validate the output
+      const parsedOutput = AnalyzeCTScanOutputSchema.safeParse(output);
+      if (!parsedOutput.success) {
+        console.error('Output validation error:', parsedOutput.error);
+        throw new Error('Failed to validate the model output. Please check the model configuration.');
+      }
+
+      console.log('Model Output:', parsedOutput.data);
+      return parsedOutput.data;
+    } catch (error) {
+      console.error('Error analyzing CT scan:', error);
+      throw new Error('Failed to analyze CT scan. Please ensure the CT scan URL is valid and try again.');
+    }
   }
 );
