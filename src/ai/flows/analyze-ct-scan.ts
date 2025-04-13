@@ -56,10 +56,10 @@ const prompt = ai.definePrompt({
 
   Here are the key characteristics to consider for each condition:
 
-  - Normal: The kidney will have a uniform appearance, clear borders, and no unusual densities or masses. The internal structures, such as the renal cortex and medulla, will be clearly distinguishable without any abnormalities.
-  - Cyst: Cysts typically appear as round or oval-shaped, fluid-filled sacs with smooth, well-defined borders. They usually have a uniform density and do not enhance with contrast.
-  - Tumor: Tumors can vary in size and shape but often present as irregular masses with heterogeneous densities. They may distort the normal kidney structure and can show enhancement with contrast. Look for signs of invasion into surrounding tissues.
-  - Stone: Kidney stones are characterized by their high density, appearing as very bright, well-defined areas on the CT scan. They can vary in size and location within the kidney.
+  - Normal: The kidney will have a uniform appearance, clear borders, and no unusual densities or masses. The internal structures, such as the renal cortex and medulla, will be clearly distinguishable without any abnormalities. Visual inspection: Normal kidney tissue appears homogeneous with a consistent density.
+  - Cyst: Cysts typically appear as round or oval-shaped, fluid-filled sacs with smooth, well-defined borders. They usually have a uniform density and do not enhance with contrast. Visual inspection: Cysts are typically dark (hypodense) compared to normal kidney tissue.
+  - Tumor: Tumors can vary in size and shape but often present as irregular masses with heterogeneous densities. They may distort the normal kidney structure and can show enhancement with contrast. Look for signs of invasion into surrounding tissues. Visual inspection: Tumors often appear as a mass distinct from the surrounding tissue, potentially distorting the kidney's shape.
+  - Stone: Kidney stones are characterized by their high density, appearing as very bright, well-defined areas on the CT scan. They can vary in size and location within the kidney. Visual inspection: Stones appear as bright white spots (hyperdense) due to their high mineral content.
 
   Instructions:
 
@@ -71,6 +71,11 @@ const prompt = ai.definePrompt({
   6. Generate a concise description of the key analytics observed in the CT scan, including size, location, and any other notable features relevant to the diagnosis.
 
   CT Scan Image: {{media url=ctScanUrl}}
+
+  Output your response in the following format:
+  - Condition: (cyst, tumor, stone, or normal)
+  - Confidence Level: (0 to 1)
+  - Analytics: (concise description of key observations)
   `,
 });
 
