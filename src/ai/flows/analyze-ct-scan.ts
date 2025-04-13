@@ -170,9 +170,11 @@ const analyzeCTScanFlow = ai.defineFlow<
 
       console.log('Model Output:', result);
       return result;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error analyzing CT scan:', error);
-      throw new Error('Failed to analyze CT scan. Please ensure the CT scan URL is valid and try again.');
+      throw new Error(`Failed to analyze CT scan. Please ensure the CT scan URL is valid and try again. Original error: ${error.message}`);
     }
   }
 );
+
+    
