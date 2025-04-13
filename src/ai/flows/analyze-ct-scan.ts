@@ -92,7 +92,7 @@ Instructions:
         *   No Enlargement or Swelling: There should be no enlargement or swelling of the kidney. The size should be within normal physiological limits.
         *   Absence of Masses or Growths: There should be no visible masses, growths, or unusual densities within the kidney tissue.
         *   No Hydronephrosis: Ensure there is no swelling or enlargement of the kidney due to urine buildup. The collecting system should appear normal and not dilated.
-        *   Consistent Density: The density of the kidney tissue should be consistent throughout, without any signs of abnormal areas. Specifically confirm the presence of all the characteristics of a normal kidney and the absence of the characteristics of cysts, tumors, and stones. Positively affirm the kidney's health by stating that no abnormalities are detected and that all structures appear normal.
+        *   Consistent Density: The density of the kidney tissue should be consistent throughout, without any signs of abnormal areas. Specifically confirm the presence of all the characteristics of a normal kidney and the absence of the characteristics of cysts, tumors, and stones. Positively affirm the kidney's health by stating that no abnormalities are detected and that no structures appear normal.
     *   Cyst:
         *   Round or Oval Shape: Cysts typically appear as rounded or oval-shaped structures.
         *   Fluid-Filled Sacs: They are filled with fluid, which results in a specific density on the CT scan.
@@ -151,7 +151,7 @@ const analyzeCTScanFlow = ai.defineFlow<
       const parsedOutput = AnalyzeCTScanOutputSchema.safeParse(output);
       if (!parsedOutput.success) {
         console.error('Output validation error:', parsedOutput.error);
-        throw parsedOutput.error; // Re-throw the ZodError for better debugging
+        throw new Error(`Failed to validate model output: ${parsedOutput.error.message}`); // Re-throw the ZodError for better debugging
       }
 
       // Ensure confidenceLevel is parsed as a number
@@ -172,7 +172,15 @@ const analyzeCTScanFlow = ai.defineFlow<
       return result;
     } catch (error: any) {
       console.error('Error analyzing CT scan:', error);
-      throw new Error(`Failed to analyze CT scan. Please ensure the CT scan URL is valid and try again. Original error: ${error.message}`);
+      let errorMessage = 'Failed to analyze CT scan. Please ensure the CT scan URL is valid and try again.';
+      if (error.message) {
+          errorMessage += ` Original error: ${error.message}`;
+      } else {
+          errorMessage += ` Unknown error occurred.`;
+      }
+      throw new Error(errorMessage);
     }
   }
 );
+
+    
