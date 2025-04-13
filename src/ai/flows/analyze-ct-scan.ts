@@ -82,10 +82,8 @@ const prompt = ai.definePrompt({
 
 Instructions:
 
-1.  First, use the analyzeCTScanForImageAnalysis tool to get a detailed analysis of the CT scan image. This will provide insights into the kidney's features and any abnormalities.
-2.  Examine the CT scan image, paying close attention to the kidney's shape, size, and internal structures.
-3.  Evaluate the presence of any abnormalities such as masses, densities, or unusual features that deviate from a normal kidney.
-4.  If abnormalities are detected, analyze their characteristics to differentiate between cysts, tumors, and stones.
+1. First, use the analyzeCTScanForImageAnalysis tool to get a detailed analysis of the CT scan image. This will provide insights into the kidney's features and any abnormalities.
+2.  Examine the CT scan image, focusing on the kidney's shape, size, and internal structures. Consider the following characteristics to differentiate between the possible conditions:
 
     *   Normal:
         *   Overall Integrity: The kidney should exhibit a consistent and homogeneous appearance throughout.
@@ -112,11 +110,13 @@ Instructions:
         *   Well-Defined Areas: Stones have clear, well-defined borders.
         *   Variable Size and Location: They can vary in size and location within the kidney.
 
-5.  For a normal kidney, ensure that the analysis specifically confirms the presence of all the characteristics of a normal kidney and the absence of the characteristics of cysts, tumors, and stones. The analysis should positively affirm the kidney's health by stating that no abnormalities are detected and that all structures appear normal.
-6.  Provide a final diagnosis, selecting one of the following conditions: cyst, tumor, stone, or normal.
-7.  Assign a confidence level between 0 and 1, reflecting the certainty of your prediction. Ensure that this level corresponds appropriately to the clarity and distinctiveness of the features observed in the scan. The value MUST be a number.
-8.  Generate a concise description of the key analytics observed in the CT scan, including size, location, and any other notable features relevant to the diagnosis.
-9.  Provide a detailed explanation for your choice, referencing specific features observed in the image that support your diagnosis. Use the analysis from the analyzeCTScanForImageAnalysis tool in your explanation.
+3.  Provide a final diagnosis, selecting one of the following conditions: cyst, tumor, stone, or normal.
+
+4.  Assign a confidence level between 0 and 1, reflecting the certainty of your prediction. Ensure that this level corresponds appropriately to the clarity and distinctiveness of the features observed in the scan.
+
+5.  Generate a concise description of the key analytics observed in the CT scan, including size, location, and any other notable features relevant to the diagnosis.
+
+6.  Provide a detailed explanation for your choice, referencing specific features observed in the image that support your diagnosis. Use the analysis from the analyzeCTScanForImageAnalysis tool in your explanation.
 
 Please analyze the CT scan with high scrutiny, and be detailed.
 
