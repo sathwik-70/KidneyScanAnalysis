@@ -11,6 +11,19 @@ import {useEffect} from 'react';
 import {RedoIcon} from 'lucide-react';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Textarea} from '@/components/ui/textarea';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+} from 'recharts';
 
 const DISCLAIMER =
   'This AI analysis is for informational purposes only and should not be considered a substitute for professional medical advice. Consult with a qualified healthcare provider for diagnosis and treatment.';
@@ -104,6 +117,17 @@ export default function Home() {
       setHighlightedArea('');
     }
   }, [prediction]);
+
+    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
+  const data = prediction
+    ? [
+      {name: 'Confidence', value: prediction.confidenceLevel * 100},
+    ]
+    : [];
+  const conditionData = prediction
+    ? [{name: prediction.condition, value: 1}]
+    : [];
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen bg-background py-8 px-4">
@@ -222,7 +246,45 @@ export default function Home() {
           </CardContent>
         </Card>
       )}
-
+       {prediction && (
+        <Card className="w-full max-w-md mb-8">
+          <CardHeader>
+            <CardTitle>Visualized Analytics</CardTitle>
+            <CardDescription>Graphical representation of the analysis.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col space-y-4">
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={data}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis domain={[0, 100]}/>
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="value" fill="#8884d8" name="Confidence Level (%)" />
+              </BarChart>
+            </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  dataKey="value"
+                  isAnimationActive={false}
+                  data={conditionData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  fill="#8884d8"
+                  label
+                >
+                  {conditionData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
 
       <Alert className="w-full max-w-md">
         <AlertTitle>Disclaimer</AlertTitle>
