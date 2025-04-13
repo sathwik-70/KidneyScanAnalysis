@@ -1,6 +1,6 @@
 'use client';
 
-import {useState} from 'react';
+import {useState, useRef} from 'react';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Input} from '@/components/ui/input';
@@ -31,6 +31,7 @@ export default function Home() {
   const [feedbackCondition, setFeedbackCondition] = useState('');
   const [feedbackComments, setFeedbackComments] = useState('');
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const imageContainerRef = useRef<HTMLDivElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -51,6 +52,15 @@ export default function Home() {
       const result = await analyzeCTScan({ctScanUrl: ctScanUrl});
       setPrediction(result);
       setShowFeedbackForm(result.confidenceLevel < 0.5); // Show feedback form if confidence is low
+
+      // Placeholder for triggering visual highlighting component
+      if (result.condition && imageContainerRef.current) {
+        //  a function `highlightRegion` that takes the image URL and a region identifier (e.g., 'cyst-area', 'tumor-area') as arguments.
+        // This function would then use a library like Fabric.js or Konva to overlay the image with shapes or colors,
+        // highlighting the identified region.
+        // highlightRegion(ctScanUrl, `${result.condition}-area`);
+        console.log(`Highlighting ${result.condition} area`);
+      }
     } catch (error) {
       console.error('Error analyzing CT scan:', error);
       alert('Failed to analyze CT scan. Please try again.');
@@ -110,12 +120,32 @@ export default function Home() {
         <CardContent className="flex flex-col space-y-4">
           <Input type="file" accept="image/*" onChange={handleImageUpload} />
           {ctScanUrl && (
-            <img
-              src={ctScanUrl}
-              alt="CT Scan"
-              className="rounded-md shadow-md"
-              style={{maxHeight: '300px', objectFit: 'contain'}}
-            />
+              <div className="relative" ref={imageContainerRef}>
+                <img
+                  src={ctScanUrl}
+                  alt="CT Scan"
+                  className="rounded-md shadow-md"
+                  style={{maxHeight: '300px', objectFit: 'contain'}}
+                />
+                {prediction?.condition === 'cyst' && (
+                  <div
+                    className="absolute inset-0 rounded-md"
+                    style={{border: '4px solid rgba(255, 0, 0, 0.5)'}} // Example: Red border for cysts
+                  />
+                )}
+                {prediction?.condition === 'tumor' && (
+                  <div
+                    className="absolute inset-0 rounded-md"
+                    style={{border: '4px solid rgba(0, 255, 0, 0.5)'}} // Example: Green border for tumors
+                  />
+                )}
+                {prediction?.condition === 'stone' && (
+                  <div
+                    className="absolute inset-0 rounded-md"
+                    style={{border: '4px solid rgba(0, 0, 255, 0.5)'}} // Example: Blue border for stones
+                  />
+                )}
+              </div>
           )}
           <Button onClick={handleAnalyze} disabled={!ctScanUrl || isLoading}>
             {isLoading ? (
