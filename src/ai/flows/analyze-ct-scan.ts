@@ -2,13 +2,14 @@
 /**
  * @fileOverview Analyzes a kidney CT scan image to predict the kidney condition.
  *
- * - analyzeCTScan - A function that handles the CT scan analysis process.
+ * - analyzeCTScan - A function that handles the CT scan analysis process and feedback integration.
  * - AnalyzeCTScanInput - The input type for the analyzeCTScan function.
  * - AnalyzeCTScanOutput - The return type for the analyzeCTScan function.
  */
 
 import {ai} from '@/ai/ai-instance';
 import {z} from 'genkit';
+import {processFeedback} from './process-feedback';
 
 const AnalyzeCTScanInputSchema = z.object({
   ctScanUrl: z.string().describe('The URL of the kidney CT scan image.'),
@@ -30,7 +31,28 @@ const AnalyzeCTScanOutputSchema = z.object({
 export type AnalyzeCTScanOutput = z.infer<typeof AnalyzeCTScanOutputSchema>;
 
 export async function analyzeCTScan(input: AnalyzeCTScanInput): Promise<AnalyzeCTScanOutput> {
-  return analyzeCTScanFlow(input);
+  const result = await analyzeCTScanFlow(input);
+
+  // If the confidence level is low, attempt to refine the analysis with user feedback.
+  if (result.confidenceLevel < 0.5) {
+    const feedbackResult = await processFeedback({
+      ctScanUrl: input.ctScanUrl,
+      initialCondition: result.condition,
+      initialExplanation: result.explanation,
+    });
+
+    // If feedback is available, update the result with the refined analysis.
+    if (feedbackResult) {
+      return {
+        condition: feedbackResult.condition,
+        confidenceLevel: feedbackResult.confidenceLevel,
+        analytics: feedbackResult.analytics,
+        explanation: feedbackResult.explanation,
+      };
+    }
+  }
+
+  return result;
 }
 
 const prompt = ai.definePrompt({

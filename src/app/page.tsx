@@ -9,6 +9,8 @@ import {Badge} from '@/components/ui/badge';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {useEffect} from 'react';
 import {RedoIcon} from 'lucide-react';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Textarea} from '@/components/ui/textarea';
 
 const DISCLAIMER =
   'This AI analysis is for informational purposes only and should not be considered a substitute for professional medical advice. Consult with a qualified healthcare provider for diagnosis and treatment.';
@@ -26,6 +28,9 @@ export default function Home() {
   >(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [highlightedArea, setHighlightedArea] = useState('');
+  const [feedbackCondition, setFeedbackCondition] = useState('');
+  const [feedbackComments, setFeedbackComments] = useState('');
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -45,6 +50,7 @@ export default function Home() {
     try {
       const result = await analyzeCTScan({ctScanUrl: ctScanUrl});
       setPrediction(result);
+      setShowFeedbackForm(result.confidenceLevel < 0.5); // Show feedback form if confidence is low
     } catch (error) {
       console.error('Error analyzing CT scan:', error);
       alert('Failed to analyze CT scan. Please try again.');
@@ -52,6 +58,20 @@ export default function Home() {
       setIsLoading(false);
     }
   };
+
+  const handleFeedback = async () => {
+    // Placeholder for sending feedback to the server/AI model
+    console.log('Feedback submitted:', {
+      condition: feedbackCondition,
+      comments: feedbackComments,
+      ctScanUrl: ctScanUrl,
+      initialCondition: prediction?.condition,
+      initialExplanation: prediction?.explanation,
+    });
+    alert('Feedback submitted. Thank you!'); // Replace with actual feedback submission logic
+    setShowFeedbackForm(false);
+  };
+
 
   useEffect(() => {
     // Placeholder for visual highlighting logic, can use a library or custom implementation
@@ -137,6 +157,42 @@ export default function Home() {
           </AlertDescription>
         </Alert>
       )}
+
+      {showFeedbackForm && prediction && (
+        <Card className="w-full max-w-md mb-8">
+          <CardHeader>
+            <CardTitle>Feedback Form</CardTitle>
+            <CardDescription>Help us improve our analysis by providing feedback.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col space-y-4">
+            <div className="space-y-2">
+              <label htmlFor="condition">Correct Condition:</label>
+              <Select onValueChange={setFeedbackCondition} defaultValue={prediction.condition}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a condition" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="normal">Normal</SelectItem>
+                  <SelectItem value="cyst">Cyst</SelectItem>
+                  <SelectItem value="tumor">Tumor</SelectItem>
+                  <SelectItem value="stone">Stone</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label htmlFor="comments">Additional Comments:</label>
+              <Textarea
+                id="comments"
+                placeholder="Provide any additional comments to help us improve..."
+                value={feedbackComments}
+                onChange={(e) => setFeedbackComments(e.target.value)}
+              />
+            </div>
+            <Button onClick={handleFeedback}>Submit Feedback</Button>
+          </CardContent>
+        </Card>
+      )}
+
 
       <Alert className="w-full max-w-md">
         <AlertTitle>Disclaimer</AlertTitle>
