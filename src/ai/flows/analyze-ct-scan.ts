@@ -52,11 +52,13 @@ Instructions:
 3.  If abnormalities are detected, analyze their characteristics to differentiate between cysts, tumors, and stones.
 
     *   Normal:
-        *   Uniform Appearance: The kidney will have a consistent and homogeneous appearance throughout.  Pay close attention to ensure there is a clear and consistent renal cortex and medulla.
-        *   Clear Borders: The outer and inner borders of the kidney should be well-defined and easily distinguishable.
-        *   No Unusual Densities or Masses: Absence of any abnormal densities, growths, or masses within the kidney tissue.
-        *   Distinguishable Internal Structures: The renal cortex and medulla should be clearly differentiated without any abnormalities or distortions.
+        *   Overall Integrity: The kidney should exhibit a consistent and homogeneous appearance throughout.
+        *   Renal Cortex and Medulla: Pay close attention to ensure there is a clear and consistent renal cortex and medulla. The boundary between the cortex and medulla should be well-defined and distinct.
+        *   Smooth Outer Contour: The outer border of the kidney should be smooth, continuous, and well-defined.
+        *   No Enlargement or Swelling: There should be no enlargement or swelling of the kidney. The size should be within normal physiological limits.
+        *   Absence of Masses or Growths: There should be no visible masses, growths, or unusual densities within the kidney tissue.
         *   No Hydronephrosis: Ensure there is no swelling or enlargement of the kidney due to urine buildup. The collecting system should appear normal and not dilated.
+        *   Consistent Density: The density of the kidney tissue should be consistent throughout, without any signs of abnormal areas.
     *   Cyst:
         *   Round or Oval Shape: Cysts typically appear as rounded or oval-shaped structures.
         *   Fluid-Filled Sacs: They are filled with fluid, which results in a specific density on the CT scan.
@@ -74,7 +76,7 @@ Instructions:
         *   Well-Defined Areas: Stones have clear, well-defined borders.
         *   Variable Size and Location: They can vary in size and location within the kidney.
 
-4.  For a normal kidney, ensure that the analysis specifically confirms the absence of the characteristics of cysts, tumors, and stones. The analysis should positively affirm the kidney's health by stating that no abnormalities are detected and that all structures appear normal.
+4.  For a normal kidney, ensure that the analysis specifically confirms the presence of all the characteristics of a normal kidney and the absence of the characteristics of cysts, tumors, and stones. The analysis should positively affirm the kidney's health by stating that no abnormalities are detected and that all structures appear normal.
 5.  Provide a final diagnosis, selecting one of the following conditions: cyst, tumor, stone, or normal.
 6.  Assign a confidence level between 0 and 1, reflecting the certainty of your prediction.
 7.  Generate a concise description of the key analytics observed in the CT scan, including size, location, and any other notable features relevant to the diagnosis.
