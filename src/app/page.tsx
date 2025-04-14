@@ -8,7 +8,7 @@ import {analyzeCTScan} from '@/ai/flows/analyze-ct-scan';
 import {Badge} from '@/components/ui/badge';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {useEffect} from 'react';
-import {RedoIcon} from 'lucide-react';
+import {RedoIcon, Check, X} from 'lucide-react';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Textarea} from '@/components/ui/textarea';
 import {
@@ -264,7 +264,7 @@ export default function Home() {
       )}
 
        {prediction && prediction.confidenceLevel < 0.6 && (
-        <Alert variant="warning" className="w-full max-w-md">
+        <Alert variant ="warning" className="w-full max-w-md">
           <AlertTitle>Low Confidence</AlertTitle>
           <AlertDescription>
             The AI analysis has a low confidence level. Please consult with a qualified healthcare provider for diagnosis and treatment.
@@ -476,12 +476,14 @@ export default function Home() {
           <CardContent>
             <div className="grid grid-cols-3 gap-4">
               {samplePredictionsData.map((sample, index) => (
-                <div key={index} className="flex flex-col items-center">
-                  <img src={sample.imageUrl} alt={`Sample ${index}`} className="w-40 h-30 object-cover mb-2 rounded" />
-                  <div className={`text-sm ${sample.isCorrect ? 'text-green-500' : 'text-red-500'}`}>
-                    Predicted: {sample.predicted}
-                    
-                    Actual: {sample.actual}
+                <div key={index} className="flex flex-col items-center relative">
+                  <img src={sample.imageUrl} alt={`Sample ${index}`} className="w-40 h-30 object-cover rounded" />
+                   <div className="absolute top-0 right-0 p-1 bg-white rounded-full">
+                    {sample.isCorrect ? (
+                      <Check className="h-4 w-4 text-green-500" />
+                    ) : (
+                      <X className="h-4 w-4 text-red-500" />
+                    )}
                   </div>
                 </div>
               ))}
