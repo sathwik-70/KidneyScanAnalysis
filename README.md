@@ -220,3 +220,4 @@ This project is licensed under the [MIT License](LICENSE).
 *   Add support for additional image formats and modalities.
 *   Provide more detailed explanations for the model's predictions, including visual highlighting of relevant features.
 
+# KidneyScanAnalysis
