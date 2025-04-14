@@ -3,6 +3,21 @@
 ### Description
 KidneyScan Analyzer is a web application designed to assist in the analysis of kidney CT scan images. It leverages AI to predict potential conditions such as cysts, tumors, stones, and normal, providing users with a confidence level and an explanation for each prediction. This tool is intended for informational purposes and should not be used as a substitute for professional medical advice. Always consult with a qualified healthcare provider for diagnosis and treatment. Sathwik (sathwikpamu@gmail.com).
 
+### Table of Contents
+1.  [Introduction](#introduction)
+2.  [Getting Started](#getting-started)
+3.  [Core Concepts](#core-concepts)
+4.  [Usage](#usage)
+5.  [AI Model Details](#ai-model-details)
+6.  [Data Analytics and Visualizations](#data-analytics-and-visualizations)
+7.  [Contributing](#contributing)
+8.  [License](#license)
+9.  [Troubleshooting](#troubleshooting)
+10. [Future Enhancements](#future-enhancements)
+
+### Introduction
+This application analyzes CT scan images of kidneys to predict possible conditions including cysts, tumors, stones, and normal states. It returns the prediction with a confidence level and an explanation. This project is for informational purposes only and should not replace professional medical consultation.
+
 ### Key Features
 *   **Image Upload and Analysis:** Upload CT scan images of kidneys for analysis.
 *   **Condition Prediction:** AI-powered prediction of kidney conditions, including normal, cyst, tumor, and stone.
@@ -81,13 +96,13 @@ This document provides a high-level overview of the project structure, key compo
 *   lucide-react
 *   Genkit AI
 
-### Setup and Installation
+### Getting Started
 
-**Prerequisites:**
+#### Prerequisites:
 *   Node.js (>= 18.17.0)
 *   npm or yarn
 
-**Installation Steps:**
+#### Installation Steps:
 1.  Clone the repository:
     
 git clone https://github.com/your-username/kidneyscan-analyzer.git
@@ -117,35 +132,91 @@ GOOGLE_GENAI_API_KEY=YOUR_API_KEY
 npm run dev
     
 
-### AI Model Integration
-The AI model is integrated using Genkit, which allows for defining AI workflows and prompts directly within the application code. The core AI logic resides in the `src/ai/flows/analyze-ct-scan.ts` file.
+### Core Concepts
 
-#### AI Workflow
-1.  **Input:** The application takes a CT scan image URL as input.
-2.  **Analysis:** The `analyzeCTScan` function in `src/ai/flows/analyze-ct-scan.ts` calls the Genkit AI flow to analyze the image.
-3.  **Prompt:** The AI prompt in `analyzeCTScanPrompt` uses the `analyzeCTScanTool` to get a detailed analysis of the CT scan image, focusing on the kidney's shape, size, and internal structures.
-4.  **Prediction:** The AI model predicts the kidney condition (cyst, tumor, stone, or normal) based on the analysis.
-5.  **Output:** The function returns the predicted condition, a confidence level, analytics, and an explanation for the choice.
+#### Application Architecture
+The application follows a Next.js structure with React components for the UI and Genkit for AI functionalities.
 
-#### Feedback Loop
-*   If the confidence level of the prediction is low, the application allows users to submit feedback.
-*   The `processFeedback` function in `src/ai/flows/process-feedback.ts` refines the analysis based on the user's feedback, allowing for continuous model improvement.
+#### Main Components
+*   **Image Upload:** Allows users to upload CT scan images.
+*   **AI Analysis:** Utilizes Genkit flows to analyze the uploaded image.
+*   **Result Display:** Presents the predicted condition, confidence level, and explanation.
+*   **Visual Highlighting:** Highlights areas of concern on the image.
+*   **Data Visualizations:** Displays analytics using Recharts.
 
-### Running the Application
-To run the application locally, follow these steps:
-1.  Ensure you have Node.js and npm installed.
-2.  Clone the repository and navigate to the project directory.
-3.  Install the dependencies using `npm install`.
-4.  Set up the environment variables in a `.env` file.
-5.  Run the development server using `npm run dev`.
-6.  Open your browser and navigate to http://localhost:9002 to view the application.
+#### AI Workflows
+The AI workflows are defined using Genkit, which provides a framework for creating AI-powered applications. The main workflow is defined in `src/ai/flows/analyze-ct-scan.ts`.
+
+### Usage
+
+#### Step-by-Step Guides
+1.  Upload a CT scan image using the file input.
+2.  Click the "Analyze CT Scan" button to trigger the AI analysis.
+3.  View the analysis results, including the predicted condition, confidence level, and explanation.
+4.  Optionally, provide feedback on the prediction if the confidence level is low.
+5.  Review the generated data visualizations for a comprehensive understanding of the analysis.
+
+### AI Model Details
+
+#### Model Training
+The AI model is trained on a dataset of kidney CT scan images with annotations for different conditions (normal, cyst, tumor, stone).
+
+#### Evaluation Metrics
+The model's performance is evaluated using metrics such as accuracy, precision, recall, F1-score, and AUC. These metrics are displayed in the data visualizations section.
+
+### Data Analytics and Visualizations
+
+#### Dataset Distribution
+A bar chart showing the distribution of images across different condition categories.
+
+#### Model Training Performance
+Line plots showing the training and validation accuracy and loss over epochs.
+
+#### Confusion Matrix
+A heatmap visualizing true vs. predicted class labels.
+
+#### Classification Report
+A table displaying precision, recall, F1-score, and support for each class.
+
+#### Sample Predictions
+A grid of test images showing predicted vs actual labels, with color-coded titles (green = correct, red = incorrect).
+
+#### ROC Curve
+A ROC curve showing performance across different thresholds and the AUC (Area Under Curve) value.
+
+#### Inference Time
+A bar chart showing the average time taken to classify a single image.
+
+#### Grad-CAM Heatmaps (Optional)
+Visual explanations of which part of the image the model focused on to make its prediction.
 
 ### Contributing
-Contributions are welcome! Please follow these guidelines:
-*   Fork the repository.
-*   Create a new branch for your feature or bug fix.
-*   Commit your changes with descriptive commit messages.
-*   Submit a pull request.
+
+#### Contribution Guidelines
+1.  Fork the repository.
+2.  Create a new branch for your feature or bug fix.
+3.  Commit your changes with descriptive commit messages.
+4.  Submit a pull request.
 
 ### License
 This project is licensed under the [MIT License](LICENSE).
+
+### Troubleshooting
+
+#### Common Issues and Solutions
+*   **Issue:** The application fails to analyze the CT scan image.
+    *   **Solution:** Ensure the CT scan URL is valid and accessible.
+*   **Issue:** The AI model provides inaccurate predictions.
+    *   **Solution:** Provide feedback on the prediction to help improve the model.
+*   **Issue:** The data visualizations are not displaying correctly.
+    *   **Solution:** Check the browser console for any JavaScript errors and ensure all dependencies are installed correctly.
+
+### Future Enhancements
+
+#### Potential Future Features and Improvements
+*   Incorporate additional data sources to improve model accuracy.
+*   Implement a user authentication system to allow users to save their analysis history.
+*   Develop a mobile app version of the application.
+*   Add support for additional image formats and modalities.
+*   Provide more detailed explanations for the model's predictions, including visual highlighting of relevant features.
+
