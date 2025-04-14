@@ -65,12 +65,12 @@ const classificationReportData = [
 ];
 
 const samplePredictionsData = [
-  {imageUrl: 'https://picsum.photos/200/150', predicted: 'Tumor', actual: 'Tumor', isCorrect: true},
-  {imageUrl: 'https://picsum.photos/200/150', predicted: 'Cyst', actual: 'Cyst', isCorrect: true},
-  {imageUrl: 'https://picsum.photos/200/150', predicted: 'Normal', actual: 'Normal', isCorrect: true},
-  {imageUrl: 'https://picsum.photos/200/150', predicted: 'Stone', actual: 'Stone', isCorrect: true},
-  {imageUrl: 'https://picsum.photos/200/150', predicted: 'Tumor', actual: 'Tumor', isCorrect: true},
-  {imageUrl: 'https://picsum.photos/200/150', predicted: 'Cyst', actual: 'Cyst', isCorrect: true},
+  {imageUrl: 'https://firebasestorage.googleapis.com/v0/b/firestore-studio.appspot.com/o/tumor.jpeg?alt=media&token=d48a1c29-7266-441a-b45c-904c39802f35', predicted: 'Tumor', actual: 'Tumor', isCorrect: true},
+  {imageUrl: 'https://firebasestorage.googleapis.com/v0/b/firestore-studio.appspot.com/o/cyst.jpeg?alt=media&token=b0a70f26-b30f-45f3-a20d-28264ef96451', predicted: 'Cyst', actual: 'Cyst', isCorrect: true},
+  {imageUrl: 'https://firebasestorage.googleapis.com/v0/b/firestore-studio.appspot.com/o/normal.jpeg?alt=media&token=0ca5c6d9-c863-4243-bbca-29c10eb4c500', predicted: 'Normal', actual: 'Normal', isCorrect: true},
+  {imageUrl: 'https://firebasestorage.googleapis.com/v0/b/firestore-studio.appspot.com/o/stone.jpeg?alt=media&token=f4e62a91-9c9b-4840-8e8a-236f057239c4', predicted: 'Stone', actual: 'Stone', isCorrect: true},
+  {imageUrl: 'https://firebasestorage.googleapis.com/v0/b/firestore-studio.appspot.com/o/tumor2.jpeg?alt=media&token=0e0c3b98-a33d-432d-833e-348ca8512668', predicted: 'Tumor', actual: 'Tumor', isCorrect: true},
+  {imageUrl: 'https://firebasestorage.googleapis.com/v0/b/firestore-studio.appspot.com/o/cyst2.jpeg?alt=media&token=e635d30c-701b-43d3-a1e0-df3ca692a27b', predicted: 'Cyst', actual: 'Cyst', isCorrect: true},
 ];
 
 const rocCurveData = [
@@ -480,7 +480,7 @@ export default function Home() {
                   <img src={sample.imageUrl} alt={`Sample ${index}`} className="w-40 h-30 object-cover mb-2 rounded" />
                   <div className={`text-sm ${sample.isCorrect ? 'text-green-500' : 'text-red-500'}`}>
                     Predicted: {sample.predicted}
-                    <br />
+                    
                     Actual: {sample.actual}
                   </div>
                 </div>
@@ -537,11 +537,11 @@ export default function Home() {
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <img src="https://picsum.photos/200/150" alt="Grad-CAM Heatmap 1" className="rounded" />
+                <img src="https://firebasestorage.googleapis.com/v0/b/firestore-studio.appspot.com/o/tumor.jpeg?alt=media&token=d48a1c29-7266-441a-b45c-904c39802f35" alt="Grad-CAM Heatmap 1" className="rounded" />
                 <p className="text-sm text-center">Class: Tumor</p>
               </div>
               <div>
-                <img src="https://picsum.photos/200/150" alt="Grad-CAM Heatmap 2" className="rounded" />
+                <img src="https://firebasestorage.googleapis.com/v0/b/firestore-studio.appspot.com/o/normal.jpeg?alt=media&token=0ca5c6d9-c863-4243-bbca-29c10eb4c500" alt="Grad-CAM Heatmap 2" className="rounded" />
                 <p className="text-sm text-center">Class: Normal</p>
               </div>
             </div>
@@ -551,4 +551,3 @@ export default function Home() {
     </div>
   );
 }
-
