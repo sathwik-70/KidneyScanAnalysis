@@ -46,21 +46,38 @@ const analyzeCtScanPrompt = ai.definePrompt({
   name: 'analyzeCtScanPrompt',
   input: {schema: AnalyzeCtScanInputSchema},
   output: {schema: AnalyzeCtScanOutputSchema},
-  prompt: `You are an AI expert in analyzing kidney CT scan images. Analyze the provided CT scan image and predict the condition of the kidney.
+  prompt: `You are an AI expert in analyzing kidney CT scan images. Your task is to analyze the provided image and classify it.
 
-    Based on the image, first provide a prediction of whether the kidney is 'normal' or 'abnormal'.
-    If the prediction is 'abnormal', provide a specific diagnosis from the following: 'cyst', 'tumor', or 'stone'.
-    If the prediction is 'normal', the diagnosis should be 'none'.
-    
-    Use the following descriptions to guide your analysis:
-    - **Cyst**: Look for a simple, well-defined, round or oval-shaped, fluid-filled sac. On a non-contrast CT, it should appear as a low-density (dark) area.
-    - **Tumor**: Look for a solid, irregularly shaped mass that enhances (lights up) with contrast. It may have a heterogeneous appearance.
-    - **Stone**: Look for a very high-density (bright white), well-defined object within the kidney or urinary tract.
-    
-    Also, provide a confidence level (0-1) for your prediction and an explanation for your reasoning. Output the prediction, diagnosis, confidence, and explanation as a JSON object.
+First, determine if the kidney appears 'normal' or 'abnormal'.
+- If the kidney is 'abnormal', you must provide a specific diagnosis: 'cyst', 'tumor', or 'stone'.
+- If the kidney is 'normal', the diagnosis must be 'none'.
 
-    Here is the CT scan image:
-    {{media url=photoDataUri}}
+Use the following detailed radiological criteria for your analysis:
+
+- **Normal Kidney**:
+  - **Contour**: Smooth and well-defined borders.
+  - **Parenchyma (tissue)**: Homogeneous (uniform) in appearance and density.
+  - **Key Features**: No evidence of masses, collections, calcifications (stones), or hydronephrosis (swelling of the renal pelvis).
+
+- **Cyst**:
+  - **Shape & Definition**: A simple cyst is a well-defined, round or oval-shaped sac.
+  - **Density**: Appears as a low-density (dark), homogeneous, fluid-filled area.
+  - **Wall**: Has a very thin, almost imperceptible wall. It does not contain solid components.
+  - **Important**: Differentiate a cyst from the renal pelvis (the central collecting part of the kidney), which is also dark but has a characteristic branching shape.
+
+- **Tumor**:
+  - **Shape & Definition**: A solid, often irregularly shaped mass.
+  - **Density**: May have a heterogeneous (non-uniform) appearance and can enhance (light up) with IV contrast.
+  - **Key Features**: Disrupts the normal smooth contour of the kidney.
+
+- **Stone**:
+  - **Density**: A very high-density (bright white), well-defined object.
+  - **Location**: Found within the kidney's collecting system or ureter.
+
+Also, provide a confidence level (0-1) for your prediction and an explanation for your reasoning. Output the prediction, diagnosis, confidence, and explanation as a JSON object.
+
+Here is the CT scan image:
+{{media url=photoDataUri}}
     `,
 });
 
