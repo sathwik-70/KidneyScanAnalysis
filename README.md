@@ -199,7 +199,7 @@ Visual explanations of which part of the image the model focused on to make its 
 4.  Submit a pull request.
 
 ### License
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the.....................
 
 ### Troubleshooting
 
