@@ -104,6 +104,9 @@ export default function Home() {
   const capitalized = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
   const getDisplayPrediction = (result: FullAnalysisResult) => {
+    if (result.diagnosis === 'not_a_ct_scan') {
+      return 'Not a CT Scan';
+    }
     if (result.prediction === 'normal') {
       return 'Normal';
     }
@@ -212,26 +215,36 @@ export default function Home() {
                 {getDisplayPrediction(result)}
               </p>
             </div>
-            <div>
-              <Label>Confidence</Label>
-              <div className="flex items-center gap-4">
-                <Progress value={result.confidence * 100} className="w-full" />
-                <span className="font-bold text-lg">
-                  {Math.round(result.confidence * 100)}%
-                </span>
-              </div>
-            </div>
-            <div>
-              <Label>Explanation</Label>
-              <p className="text-muted-foreground">{result.explanation}</p>
-            </div>
-            {result.highlightedAreas && (
-              <div>
-                <Label className="flex items-center gap-2">
-                  <Search className="h-4 w-4" /> Areas of Note
-                </Label>
-                <p className="text-muted-foreground">{result.highlightedAreas}</p>
-              </div>
+            {result.diagnosis !== 'not_a_ct_scan' && (
+              <>
+                <div>
+                  <Label>Confidence</Label>
+                  <div className="flex items-center gap-4">
+                    <Progress value={result.confidence * 100} className="w-full" />
+                    <span className="font-bold text-lg">
+                      {Math.round(result.confidence * 100)}%
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <Label>Explanation</Label>
+                  <p className="text-muted-foreground">{result.explanation}</p>
+                </div>
+                {result.highlightedAreas && (
+                  <div>
+                    <Label className="flex items-center gap-2">
+                      <Search className="h-4 w-4" /> Areas of Note
+                    </Label>
+                    <p className="text-muted-foreground">{result.highlightedAreas}</p>
+                  </div>
+                )}
+              </>
+            )}
+            {result.diagnosis === 'not_a_ct_scan' && (
+               <div>
+                  <Label>Explanation</Label>
+                  <p className="text-muted-foreground">{result.explanation}</p>
+                </div>
             )}
           </CardContent>
           <CardFooter className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-muted/50 p-4 rounded-b-lg">

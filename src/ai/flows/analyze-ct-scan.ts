@@ -25,8 +25,8 @@ const AnalyzeCtScanOutputSchema = z.object({
     .enum(['normal', 'abnormal'])
     .describe('The predicted condition of the kidney.'),
   diagnosis: z
-    .enum(['none', 'cyst', 'tumor', 'stone'])
-    .describe("The specific diagnosis if the condition is 'abnormal'."),
+    .enum(['none', 'cyst', 'tumor', 'stone', 'not_a_ct_scan'])
+    .describe("The specific diagnosis if the condition is 'abnormal'. If the image is not a CT scan, this will be 'not_a_ct_scan'."),
   confidence: z
     .number()
     .min(0)
@@ -46,11 +46,19 @@ const analyzeCtScanPrompt = ai.definePrompt({
   name: 'analyzeCtScanPrompt',
   input: {schema: AnalyzeCtScanInputSchema},
   output: {schema: AnalyzeCtScanOutputSchema},
-  prompt: `You are an AI expert in analyzing kidney CT scan images. Your task is to analyze the provided image and classify it.
+  prompt: `You are an AI expert in analyzing kidney CT scan images. Your task is to analyze the provided image by following these steps:
 
-First, determine if the kidney appears 'normal' or 'abnormal'.
-- If the kidney is 'abnormal', you must provide a specific diagnosis: 'cyst', 'tumor', or 'stone'.
-- If the kidney is 'normal', the diagnosis must be 'none'.
+Step 1: Validate the Image
+- First, determine if the provided image is a valid CT scan of a human kidney.
+- If it is NOT a kidney CT scan, set 'prediction' to 'abnormal', 'diagnosis' to 'not_a_ct_scan', provide an explanation, and set confidence to a high value (e.g., 0.95).
+
+Step 2: Classify the Kidney
+- If the image is a valid kidney CT scan, classify it as 'normal' or 'abnormal'.
+- If the kidney is 'normal', set 'prediction' to 'normal' and 'diagnosis' to 'none'.
+- If the kidney is 'abnormal', set 'prediction' to 'abnormal'.
+
+Step 3: Diagnose Abnormal Kidneys
+- If you classified the kidney as 'abnormal' in Step 2, you must provide a specific diagnosis from the following options: 'cyst', 'tumor', or 'stone'. Set the 'diagnosis' field accordingly.
 
 Use the following detailed radiological criteria for your analysis:
 
@@ -74,7 +82,7 @@ Use the following detailed radiological criteria for your analysis:
   - **Density**: A very high-density (bright white), well-defined object.
   - **Location**: Found within the kidney's collecting system or ureter.
 
-Also, provide a confidence level (0-1) for your prediction and an explanation for your reasoning. Output the prediction, diagnosis, confidence, and explanation as a JSON object.
+Also, provide a confidence level (0-1) for your final conclusion and an explanation for your reasoning. Output the prediction, diagnosis, confidence, and explanation as a JSON object.
 
 Here is the CT scan image:
 {{media url=photoDataUri}}
