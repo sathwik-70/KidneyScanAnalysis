@@ -103,6 +103,16 @@ export default function Home() {
 
   const capitalized = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
+  const getDisplayPrediction = (result: FullAnalysisResult) => {
+    if (result.prediction === 'normal') {
+      return 'Normal';
+    }
+    if (result.diagnosis && result.diagnosis !== 'none') {
+      return capitalized(result.diagnosis);
+    }
+    return capitalized(result.prediction);
+  }
+
   return (
     <div className="w-full max-w-4xl mx-auto flex flex-col gap-8">
       <div className="text-center">
@@ -199,7 +209,7 @@ export default function Home() {
             <div>
               <Label>Prediction</Label>
               <p className="text-2xl font-bold font-headline">
-                {capitalized(result.prediction)}
+                {getDisplayPrediction(result)}
               </p>
             </div>
             <div>

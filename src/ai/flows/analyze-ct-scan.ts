@@ -22,8 +22,11 @@ export type AnalyzeCtScanInput = z.infer<typeof AnalyzeCtScanInputSchema>;
 
 const AnalyzeCtScanOutputSchema = z.object({
   prediction: z
-    .enum(['normal', 'cyst', 'tumor', 'stone'])
+    .enum(['normal', 'abnormal'])
     .describe('The predicted condition of the kidney.'),
+  diagnosis: z
+    .enum(['none', 'cyst', 'tumor', 'stone'])
+    .describe("The specific diagnosis if the condition is 'abnormal'."),
   confidence: z
     .number()
     .min(0)
@@ -45,7 +48,10 @@ const analyzeCtScanPrompt = ai.definePrompt({
   output: {schema: AnalyzeCtScanOutputSchema},
   prompt: `You are an AI expert in analyzing kidney CT scan images. Analyze the provided CT scan image and predict the condition of the kidney.
 
-    Based on the image, provide a prediction of whether the kidney is normal, or has a cyst, tumor, or stone. Also, provide a confidence level (0-1) for your prediction and an explanation for your reasoning. Output the prediction, confidence, and explanation as a JSON object.
+    Based on the image, first provide a prediction of whether the kidney is 'normal' or 'abnormal'.
+    If the prediction is 'abnormal', provide a specific diagnosis from the following: 'cyst', 'tumor', or 'stone'.
+    If the prediction is 'normal', the diagnosis should be 'none'.
+    Also, provide a confidence level (0-1) for your prediction and an explanation for your reasoning. Output the prediction, diagnosis, confidence, and explanation as a JSON object.
 
     Here is the CT scan image:
     {{media url=photoDataUri}}

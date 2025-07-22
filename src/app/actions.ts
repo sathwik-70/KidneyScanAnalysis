@@ -18,7 +18,7 @@ export async function analyzeScanAction(
 
     const explanationResult = await generatePredictionExplanation({
       imageUri: photoDataUri,
-      condition: initialResult.prediction,
+      condition: initialResult.prediction === 'normal' ? 'normal' : initialResult.diagnosis,
       confidence: initialResult.confidence,
     });
 
