@@ -46,45 +46,64 @@ const analyzeCtScanPrompt = ai.definePrompt({
   name: 'analyzeCtScanPrompt',
   input: {schema: AnalyzeCtScanInputSchema},
   output: {schema: AnalyzeCtScanOutputSchema},
-  prompt: `You are an AI expert in analyzing kidney CT scan images. Your task is to analyze the provided image by following these steps:
+  prompt: `You are a world-class radiologist AI specializing in kidney CT scans. Your task is to analyze the provided image with the highest degree of accuracy, following a strict, systematic process.
 
-Step 1: Validate the Image
-- First, determine if the provided image is a valid CT scan of a human kidney.
-- If it is NOT a kidney CT scan, set 'prediction' to 'abnormal', 'diagnosis' to 'not_a_ct_scan', provide an explanation, and set confidence to a high value (e.g., 0.95).
+**Step 1: Image Validation**
+First, meticulously examine the image to confirm it is a valid CT scan of a human kidney.
+- If it is **NOT** a kidney CT scan, you must set 'prediction' to 'abnormal' and 'diagnosis' to 'not_a_ct_scan'. Provide a clear explanation that the image is not a kidney CT scan. Set confidence to a high value (e.g., 0.98).
 
-Step 2: Classify the Kidney
-- If the image is a valid kidney CT scan, classify it as 'normal' or 'abnormal'.
-- If the kidney is 'normal', set 'prediction' to 'normal' and 'diagnosis' to 'none'.
-- If the kidney is 'abnormal', set 'prediction' to 'abnormal'.
+**Step 2: Condition Classification**
+If the image is a valid kidney CT scan, you will classify its condition.
+- If the kidney appears entirely healthy and free of anomalies, classify it as 'normal'.
+- If you detect any abnormality, classify it as 'abnormal'.
 
-Step 3: Diagnose Abnormal Kidneys
-- If you classified the kidney as 'abnormal' in Step 2, you must provide a specific diagnosis from the following options: 'cyst', 'tumor', or 'stone'. Set the 'diagnosis' field accordingly.
+**Step 3: Specific Diagnosis for Abnormal Kidneys**
+If you classified the kidney as 'abnormal' in Step 2, you must provide a specific diagnosis.
+- Choose one of the following: 'cyst', 'tumor', or 'stone'.
+- Set the 'diagnosis' field to your finding.
 
-Use the following detailed radiological criteria for your analysis:
+---
+
+**Detailed Radiological Criteria:**
+
+You must use the following criteria for your analysis. Pay extremely close attention to the subtle differences.
 
 - **Normal Kidney**:
-  - **Contour**: Smooth and well-defined borders.
-  - **Parenchyma (tissue)**: Homogeneous (uniform) in appearance and density.
-  - **Key Features**: No evidence of masses, collections, calcifications (stones), or hydronephrosis (swelling of the renal pelvis).
+  - **Contour**: The kidney must have a smooth and well-defined border. There should be no bulges or irregularities.
+  - **Parenchyma (tissue)**: The tissue must be homogeneous, meaning it has a uniform appearance and density throughout. There are no focal masses, fluid collections, or bright white spots.
+  - **Collecting System**: The renal pelvis (the central collecting part) should be dark but have its characteristic branching shape, not a simple round or oval shape.
 
 - **Cyst**:
-  - **Shape & Definition**: A simple cyst is a well-defined, round or oval-shaped sac.
-  - **Density**: Appears as a low-density (dark), homogeneous, fluid-filled area.
-  - **Wall**: Has a very thin, almost imperceptible wall. It does not contain solid components.
-  - **Important**: Differentiate a cyst from the renal pelvis (the central collecting part of the kidney), which is also dark but has a characteristic branching shape.
+  - **Shape and Definition**: A simple cyst is a very well-defined, round or oval-shaped sac.
+  - **Density**: It appears as a low-density (dark), homogeneous, fluid-filled area.
+  - **Wall**: It has a very thin, almost imperceptible wall. It does not contain solid components.
+  - **Key Distinction**: It is critical to differentiate a cyst from the normal renal pelvis. A cyst is typically more spherical and is not part of the branching collecting system.
 
 - **Tumor**:
-  - **Shape & Definition**: A solid, often irregularly shaped mass.
-  - **Density**: May have a heterogeneous (non-uniform) appearance and can enhance (light up) with IV contrast.
-  - **Key Features**: Disrupts the normal smooth contour of the kidney.
+  - **Shape and Definition**: A solid, often irregularly shaped mass that disrupts the kidney's smooth contour.
+  - **Density**: It often has a heterogeneous (non-uniform) appearance and can enhance (light up) with contrast.
 
 - **Stone**:
-  - **Density**: A very high-density (bright white), well-defined object.
-  - **Location**: Found within the kidney's collecting system or ureter.
+  - **Density**: A very high-density (bright white), well-defined object. It is hyperdense.
+  - **Location**: Typically found within the kidney's collecting system.
 
-Also, provide a confidence level (0-1) for your final conclusion and an explanation for your reasoning. Output the prediction, diagnosis, confidence, and explanation as a JSON object.
+**Examples:**
 
-Here is the CT scan image:
+To calibrate your analysis, refer to these examples.
+
+- **Example 1: Normal Kidney**
+  - **Observation**: The image shows a kidney with a perfectly smooth contour. The parenchyma is uniform in density. The central collecting system is dark but has a normal, branching appearance. There are no round fluid collections or bright calcifications.
+  - **Conclusion**: This is a classic example of a **normal** kidney.
+
+- **Example 2: Kidney with a Cyst**
+  - **Observation**: The image shows a kidney that is mostly normal, but there is a distinct, well-defined, dark, circular area on the outer edge. This area is fluid-density and has a very thin wall. It is clearly separate from the main collecting system.
+  - **Conclusion**: This is an **abnormal** kidney with a **cyst**.
+
+---
+
+Finally, provide a confidence level (0-1) for your conclusion and a brief, technical explanation for your reasoning based on the criteria above. Output your final analysis as a JSON object.
+
+Here is the CT scan image to analyze:
 {{media url=photoDataUri}}
     `,
 });
