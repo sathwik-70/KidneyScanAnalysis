@@ -4,7 +4,7 @@
  * @fileOverview This file defines the Genkit flow for analyzing kidney CT scan images to predict potential conditions.
  *
  * analyzeCtScan - An async function that takes a CT scan image data URI and returns a prediction with confidence and explanation.
- * AnalyzeCtScanInput - The input type for the analyzeCtScan function, which is a data URI of the CT scan image.
+ * AnalyzeCtScanInput - The input type for the analyzeCtscan function, which is a data URI of the CT scan image.
  * AnalyzeCtScanOutput - The output type for the analyzeCtScan function, including the predicted condition, confidence level, and explanation.
  */
 
@@ -51,6 +51,12 @@ const analyzeCtScanPrompt = ai.definePrompt({
     Based on the image, first provide a prediction of whether the kidney is 'normal' or 'abnormal'.
     If the prediction is 'abnormal', provide a specific diagnosis from the following: 'cyst', 'tumor', or 'stone'.
     If the prediction is 'normal', the diagnosis should be 'none'.
+    
+    Use the following descriptions to guide your analysis:
+    - **Cyst**: Look for a simple, well-defined, round or oval-shaped, fluid-filled sac. On a non-contrast CT, it should appear as a low-density (dark) area.
+    - **Tumor**: Look for a solid, irregularly shaped mass that enhances (lights up) with contrast. It may have a heterogeneous appearance.
+    - **Stone**: Look for a very high-density (bright white), well-defined object within the kidney or urinary tract.
+    
     Also, provide a confidence level (0-1) for your prediction and an explanation for your reasoning. Output the prediction, diagnosis, confidence, and explanation as a JSON object.
 
     Here is the CT scan image:
