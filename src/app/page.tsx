@@ -63,6 +63,7 @@ export default function Home() {
         setImagePreview(URL.createObjectURL(file));
         setAnalysisState("idle");
         setResult(null);
+        setError(null);
       };
       reader.readAsDataURL(file);
     }
@@ -80,6 +81,7 @@ export default function Home() {
 
     setAnalysisState("loading");
     setError(null);
+    setResult(null);
 
     const response = await analyzeScanAction(imageDataUri);
 
@@ -104,11 +106,11 @@ export default function Home() {
     return s.charAt(0).toUpperCase() + s.slice(1);
   }
 
-  const getDisplayDiagnosis = (result: FullAnalysisResult) => {
-    if (result.diagnosis === 'not_a_ct_scan') {
+  const getDisplayDiagnosis = (diagnosis: string) => {
+    if (diagnosis === 'not_a_ct_scan') {
       return 'Not a CT Scan';
     }
-    return capitalized(result.diagnosis);
+    return capitalized(diagnosis.replace(/_/g, " "));
   }
 
   return (
@@ -185,6 +187,26 @@ export default function Home() {
         </CardFooter>
       </Card>
 
+      {analysisState === "loading" && (
+         <Card>
+           <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+                <Bot className="h-5 w-5" /> AI is thinking...
+            </CardTitle>
+            <CardDescription>
+                Please wait while the AI analyzes the scan. This may take a moment.
+            </CardDescription>
+           </CardHeader>
+           <CardContent className="space-y-4">
+            <div className="flex items-center gap-4">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                <p>Analyzing image for key indicators...</p>
+            </div>
+            <Progress value={45} className="w-full" />
+           </CardContent>
+         </Card>
+      )}
+
       {analysisState === "error" && error && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
@@ -207,19 +229,22 @@ export default function Home() {
             <div>
               <Label>Diagnosis</Label>
               <p className="text-2xl font-bold font-headline">
-                {getDisplayDiagnosis(result)}
+                {getDisplayDiagnosis(result.diagnosis)}
               </p>
             </div>
             
-            <div>
-              <Label>Confidence</Label>
-              <div className="flex items-center gap-4">
-                <Progress value={result.confidence * 100} className="w-full" />
-                <span className="font-bold text-lg">
-                  {Math.round(result.confidence * 100)}%
-                </span>
+            {result.diagnosis !== 'not_a_ct_scan' && (
+              <div>
+                <Label>Confidence</Label>
+                <div className="flex items-center gap-4">
+                  <Progress value={result.confidence * 100} className="w-full" />
+                  <span className="font-bold text-lg">
+                    {Math.round(result.confidence * 100)}%
+                  </span>
+                </div>
               </div>
-            </div>
+            )}
+
             <div>
               <Label>Explanation</Label>
               <p className="text-muted-foreground">{result.explanation}</p>

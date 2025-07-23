@@ -23,8 +23,7 @@ const GeneratePredictionExplanationInputSchema = z.object({
 export type GeneratePredictionExplanationInput = z.infer<typeof GeneratePredictionExplanationInputSchema>;
 
 const GeneratePredictionExplanationOutputSchema = z.object({
-  explanation: z.string().describe('A human-readable explanation for the prediction.'),
-  highlightedAreas: z.string().optional().describe('Description of areas of concern.'),
+  explanation: z.string().describe('A human-readable explanation for the prediction, written for a patient to understand.'),
 });
 export type GeneratePredictionExplanationOutput = z.infer<typeof GeneratePredictionExplanationOutputSchema>;
 
@@ -36,14 +35,29 @@ const prompt = ai.definePrompt({
   name: 'generatePredictionExplanationPrompt',
   input: {schema: GeneratePredictionExplanationInputSchema},
   output: {schema: GeneratePredictionExplanationOutputSchema},
-  prompt: `You are a medical AI assistant specialized in explaining kidney CT scan analysis results.
+  prompt: `You are a medical AI assistant. Your task is to explain a kidney CT scan diagnosis to a patient in a clear, simple, and reassuring way.
 
-  Based on the provided CT scan image, predicted condition, and confidence level, generate a human-readable explanation for the prediction. If possible explain where areas of concern are on the image.
+**Image Analysis:**
+- The AI has analyzed the provided CT scan image and made a diagnosis.
+- **Diagnosis:** {{{condition}}}
+- **Confidence:** {{{confidence}}}
 
-  Image: {{media url=imageUri}}
-  Condition: {{{condition}}}
-  Confidence Level: {{{confidence}}}
-  Explanation: `,
+**Your Task:**
+Write a short, easy-to-understand explanation for the patient based on the AI's diagnosis.
+
+- **If the diagnosis is 'normal':** Reassure the patient that the scan appears normal and explain what that means in simple terms (e.g., "The scan shows that your kidney has a normal size and shape, with no clear signs of stones, cysts, or tumors.").
+- **If the diagnosis is 'cyst', 'tumor', or 'stone':**
+    - Explain what the condition is in simple terms.
+    - Briefly describe the visual evidence the AI likely used (e.g., for a stone: "a small, dense spot"; for a cyst: "a round, fluid-filled area").
+    - **Crucially, end by advising the patient to discuss these findings with their doctor for a formal diagnosis and next steps.** Do not provide medical advice.
+- **Tone:** Keep the tone calm, professional, and empathetic. Avoid overly technical jargon.
+
+**Context:**
+- CT Scan Image: {{media url=imageUri}}
+- AI Predicted Condition: {{{condition}}}
+- AI Confidence Level: {{{confidence}}}
+
+Generate the explanation now.`,
 });
 
 const generatePredictionExplanationFlow = ai.defineFlow(

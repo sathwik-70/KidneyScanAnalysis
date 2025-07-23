@@ -31,9 +31,6 @@ const AnalyzeCtScanOutputSchema = z.object({
     .min(0)
     .max(1)
     .describe('The confidence level of the diagnosis, from 0 to 1.'),
-  explanation: z
-    .string()
-    .describe('A technical explanation for the diagnosis based on visual evidence.'),
 });
 export type AnalyzeCtScanOutput = z.infer<typeof AnalyzeCtScanOutputSchema>;
 
@@ -83,7 +80,7 @@ If the image is a valid kidney CT scan, you will perform a detailed analysis bas
 
 ---
 **Final Output:**
-Based on your systematic analysis, provide the final diagnosis, a confidence score between 0 and 1, and a concise, technical explanation for your decision based on the visual evidence from the criteria above.
+Based on your systematic analysis, provide the final diagnosis and a confidence score between 0 and 1. Do not provide an explanation.
 
 CT Scan Image to analyze:
 {{media url=photoDataUri}}
