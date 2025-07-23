@@ -3,202 +3,122 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
-// --- Schema and Flow for Analyzing CT Scan ---
+// --- Unified Schema for a single, combined AI flow ---
 
-const AnalyzeCtScanInputSchema = z.object({
-  photoDataUri: z
-    .string()
-    .describe(
-      "A CT scan image of a kidney, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
-    ),
-});
-type AnalyzeCtScanInput = z.infer<typeof AnalyzeCtScanInputSchema>;
-
-const AnalyzeCtScanOutputSchema = z.object({
+const FullAnalysisResultSchema = z.object({
   diagnosis: z
     .enum(['normal', 'cyst', 'tumor', 'stone', 'not_a_ct_scan'])
     .describe(
-      "The final diagnosis. If the image is not a CT scan, this will be 'not_a_ct_scan'."
+      "The final diagnosis. If the image is not a CT scan, this must be 'not_a_ct_scan'."
     ),
   confidence: z
     .number()
     .min(0)
     .max(1)
     .describe('The confidence level of the diagnosis, from 0 to 1.'),
+  explanation: z
+    .string()
+    .describe(
+      'A human-readable explanation for the diagnosis, written for a patient to understand. If not a CT scan, explain that.'
+    ),
 });
-export type AnalyzeCtScanOutput = z.infer<typeof AnalyzeCtScanOutputSchema>;
+export type FullAnalysisResult = z.infer<typeof FullAnalysisResultSchema>;
 
-const analyzeCtScanPrompt = ai.definePrompt({
-  name: 'analyzeCtScanPrompt',
-  input: { schema: AnalyzeCtScanInputSchema },
-  output: { schema: AnalyzeCtScanOutputSchema },
+
+// --- Unified Prompt and Flow ---
+
+const analyzeAndExplainCtScanPrompt = ai.definePrompt({
+  name: 'analyzeAndExplainCtScanPrompt',
+  input: {
+    schema: z.object({
+      photoDataUri: z
+        .string()
+        .describe(
+          "A CT scan image of a kidney, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+        ),
+    }),
+  },
+  output: { schema: FullAnalysisResultSchema },
   model: 'googleai/gemini-1.5-pro-latest',
-  prompt: `You are a world-class radiologist AI specializing in kidney CT scans. Your task is to analyze the provided image with the highest degree of accuracy, following a strict, systematic process.
+  prompt: `You are a world-class radiologist AI specializing in kidney CT scans. Your task is to analyze the provided image with the highest degree of accuracy and then provide a clear, patient-friendly explanation. You must output a single JSON object with 'diagnosis', 'confidence', and 'explanation'.
 
 **Step 1: Image Validation**
 First, meticulously examine the image to confirm it is a valid CT scan of a human kidney.
-- If it is **NOT** a kidney CT scan, you must set 'diagnosis' to 'not_a_ct_scan'. Provide a clear explanation that the image is not a kidney CT scan. Set confidence to a high value (e.g., 0.98), and STOP.
+- If it is **NOT** a kidney CT scan, you must set 'diagnosis' to 'not_a_ct_scan', 'confidence' to a high value (e.g., 0.98), and 'explanation' to 'The uploaded image does not appear to be a valid CT scan of a kidney. Please upload a relevant medical image for analysis.', then STOP.
 
-**Step 2: Systematic Radiological Analysis**
-If the image is a valid kidney CT scan, you will perform a detailed analysis based on the following strict criteria. You must classify the scan into **one** of the four categories: Normal, Cyst, Tumor, or Stone.
+**Step 2: Systematic Radiological Analysis & Explanation Generation**
+If the image is a valid kidney CT scan, perform a detailed analysis based on the following strict criteria. You must classify the scan into **one** of the four categories: Normal, Cyst, Tumor, or Stone. After determining the diagnosis, generate the explanation.
 
 ---
 **Radiological Criteria (Analyze in this order):**
 
 1.  **Stone (Calculus):**
-    -   **Primary Evidence:** Look for a **hyperdense (very bright white)**, well-defined object.
-    -   **Location:** Typically located within the renal pelvis or calyces (the collecting system).
-    -   **Action:** If this is present, classify as **'stone'**.
+    -   **Primary Evidence:** Look for a **hyperdense (very bright white)**, well-defined object, typically within the renal pelvis or calyces.
+    -   **Action:** If present, classify as **'stone'**.
+    -   **Explanation:** Explain that the scan shows a small, dense spot characteristic of a kidney stone and advise the user to consult their doctor.
 
 2.  **Tumor (Neoplasm):**
-    -   **Primary Evidence:** Look for a **solid, heterogeneous (non-uniform density)** mass that disrupts the kidney's smooth contour. It is not a simple fluid collection. It often shows enhancement (lights up with contrast) compared to the surrounding kidney tissue.
-    -   **Contour:** The mass often causes an abnormal bulge or irregularity on the kidney's border.
-    -   **Action:** If this is present, classify as **'tumor'**.
+    -   **Primary Evidence:** Look for a **solid, heterogeneous (non-uniform density)** mass that disrupts the kidney's smooth contour. It is not a simple fluid collection and often shows enhancement with contrast.
+    -   **Action:** If present, classify as **'tumor'**.
+    -   **Explanation:** Explain that there is an area with unusual tissue growth that may indicate a tumor and stress the importance of discussing the findings with a doctor for further evaluation.
 
 3.  **Cyst:**
-    -   **Primary Evidence:** Look for a **well-defined, round or oval-shaped, homogeneous, low-density (dark, fluid-filled)** area.
-    -   **Wall:** It must have a very thin, almost imperceptible wall. It contains no solid components.
-    -   **Critical Distinction:** You must differentiate a simple cyst from the normal renal pelvis. The renal pelvis is part of the branching, complex collecting system. A cyst is a separate, distinct, spherical structure. If you see a dark area that is part of the branching collecting system, it is NOT a cyst.
-    -   **Action:** If a distinct, thin-walled, spherical fluid collection is present, classify as **'cyst'**.
+    -   **Primary Evidence:** Look for a **well-defined, round, homogeneous, low-density (dark, fluid-filled)** area with a very thin wall.
+    -   **Critical Distinction:** Differentiate this from the normal renal pelvis, which is a branching structure. A cyst is a separate, spherical structure.
+    -   **Action:** If a distinct cyst is present, classify as **'cyst'**.
+    -   **Explanation:** Explain that the scan shows a simple, fluid-filled sac known as a cyst, which is often benign, but that a doctor should confirm the diagnosis.
 
 4.  **Normal:**
-    -   **Primary Evidence:** The kidney has a smooth, well-defined contour.
-    -   **Parenchyma (tissue):** The tissue is homogeneous (uniform density) with no focal masses, no hyperdense stones, and no distinct cysts as defined above.
-    -   **Collecting System:** The renal pelvis and calyces are visible and may be dark (fluid-filled), but they have a characteristic branching, not a simple spherical, shape.
-    -   **Action:** If **none** of the criteria for Stone, Tumor, or Cyst are met, classify as **'normal'**. This is the default diagnosis if no pathology is found.
+    -   **Primary Evidence:** Smooth kidney contour, homogeneous tissue, and no signs matching the criteria for stone, tumor, or cyst.
+    -   **Action:** If no pathology is found, classify as **'normal'**.
+    -   **Explanation:** Reassure the patient that the scan appears normal, showing the kidney has a standard size and shape with no clear signs of common issues like stones, cysts, or tumors.
 
 ---
 **Final Output:**
-Based on your systematic analysis, provide the final diagnosis and a confidence score between 0 and 1. Do not provide an explanation.
+Based on your systematic analysis, provide the final JSON object containing 'diagnosis', 'confidence' (a score between 0 and 1), and the corresponding 'explanation'.
 
 CT Scan Image to analyze:
 {{media url=photoDataUri}}
     `,
 });
 
-const analyzeCtScanFlow = ai.defineFlow(
+const analyzeAndExplainCtScanFlow = ai.defineFlow(
   {
-    name: 'analyzeCtScanFlow',
-    inputSchema: AnalyzeCtScanInputSchema,
-    outputSchema: AnalyzeCtScanOutputSchema,
+    name: 'analyzeAndExplainCtScanFlow',
+    inputSchema: z.object({ photoDataUri: z.string() }),
+    outputSchema: FullAnalysisResultSchema,
   },
   async (input) => {
-    const { output } = await analyzeCtScanPrompt(input);
+    const { output } = await analyzeAndExplainCtScanPrompt(input);
     return output!;
   }
 );
 
 
-// --- Schema and Flow for Generating Prediction Explanation ---
-
-const GeneratePredictionExplanationInputSchema = z.object({
-    imageUri: z
-      .string()
-      .describe(
-        "A CT scan image of a kidney, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
-      ),
-    condition: z.string().describe('The predicted kidney condition (normal, cyst, tumor, or stone).'),
-    confidence: z.number().describe('The confidence level of the prediction (0-1).'),
-  });
-export type GeneratePredictionExplanationInput = z.infer<typeof GeneratePredictionExplanationInputSchema>;
-
-const GeneratePredictionExplanationOutputSchema = z.object({
-    explanation: z.string().describe('A human-readable explanation for the prediction, written for a patient to understand.'),
-});
-export type GeneratePredictionExplanationOutput = z.infer<typeof GeneratePredictionExplanationOutputSchema>;
-
-const generatePredictionExplanationPrompt = ai.definePrompt({
-    name: 'generatePredictionExplanationPrompt',
-    input: {schema: GeneratePredictionExplanationInputSchema},
-    output: {schema: GeneratePredictionExplanationOutputSchema},
-    model: 'googleai/gemini-1.5-pro-latest',
-    prompt: `You are a medical AI assistant. Your task is to explain a kidney CT scan diagnosis to a patient in a clear, simple, and reassuring way.
-
-**Image Analysis:**
-- The AI has analyzed the provided CT scan image and made a diagnosis.
-- **Diagnosis:** {{{condition}}}
-- **Confidence:** {{{confidence}}}
-
-**Your Task:**
-Write a short, easy-to-understand explanation for the patient based on the AI's diagnosis.
-
-- **If the diagnosis is 'normal':** Reassure the patient that the scan appears normal and explain what that means in simple terms (e.g., "The scan shows that your kidney has a normal size and shape, with no clear signs of stones, cysts, or tumors.").
-- **If the diagnosis is 'cyst', 'tumor', or 'stone':**
-    - Explain what the condition is in simple terms.
-    - Briefly describe the visual evidence the AI likely used (e.g., for a stone: "a small, dense spot"; for a cyst: "a round, fluid-filled area").
-    - **Crucially, end by advising the patient to discuss these findings with their doctor for a formal diagnosis and next steps.** Do not provide medical advice.
-- **Tone:** Keep the tone calm, professional, and empathetic. Avoid overly technical jargon.
-
-**Context:**
-- CT Scan Image: {{media url=imageUri}}
-- AI Predicted Condition: {{{condition}}}
-- AI Confidence Level: {{{confidence}}}
-
-Generate the explanation now.`,
-});
-
-const generatePredictionExplanationFlow = ai.defineFlow(
-    {
-      name: 'generatePredictionExplanationFlow',
-      inputSchema: GeneratePredictionExplanationInputSchema,
-      outputSchema: GeneratePredictionExplanationOutputSchema,
-    },
-    async (input) => {
-      const {output} = await generatePredictionExplanationPrompt(input);
-      return output!;
-    }
-);
-
-
 // --- Main Action Function ---
-
-export interface FullAnalysisResult
-  extends AnalyzeCtScanOutput,
-    GeneratePredictionExplanationOutput {
-  // This interface now combines the output of both AI flows.
-}
 
 export async function analyzeScanAction(
   photoDataUri: string
 ): Promise<{ success: boolean; data?: FullAnalysisResult; error?: string }> {
   try {
-    // Step 1: Get the initial diagnosis
-    const diagnosisResult = await analyzeCtScanFlow({ photoDataUri });
+    // A single, unified call to the AI flow
+    const result = await analyzeAndExplainCtScanFlow({ photoDataUri });
 
-    if (diagnosisResult.diagnosis === 'not_a_ct_scan') {
-      return {
-        success: true,
-        data: {
-          ...diagnosisResult,
-          explanation:
-            'The uploaded image does not appear to be a valid CT scan of a kidney. Please upload a relevant medical image for analysis.',
-        },
-      };
+    if (!result) {
+      throw new Error('AI analysis returned no result.');
     }
 
-    // Step 2: Generate a detailed explanation based on the diagnosis
-    const explanationResult = await generatePredictionExplanationFlow({
-      imageUri: photoDataUri,
-      condition: diagnosisResult.diagnosis,
-      confidence: diagnosisResult.confidence,
-    });
-
-    // Combine the results from both steps
-    const fullResult: FullAnalysisResult = {
-      ...diagnosisResult,
-      ...explanationResult,
-    };
-
-    return { success: true, data: fullResult };
+    return { success: true, data: result };
   } catch (error) {
     console.error('Error analyzing CT scan:', error);
     let errorMessage = 'An unknown error occurred during analysis.';
     if (error instanceof Error) {
       errorMessage = error.message;
     }
+    // Return a user-friendly error message
     return {
       success: false,
-      error: `Failed to analyze the image. Please try again.`,
+      error: `Failed to analyze the image. Please try again. The AI model may be temporarily unavailable.`,
     };
   }
 }
