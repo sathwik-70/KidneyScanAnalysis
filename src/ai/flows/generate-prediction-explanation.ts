@@ -8,7 +8,7 @@
  * - GeneratePredictionExplanationOutput - The return type for the generatePredictionExplanation function.
  */
 
-import {ai} from '@/ai/init';
+import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GeneratePredictionExplanationInputSchema = z.object({

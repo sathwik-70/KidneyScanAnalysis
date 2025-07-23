@@ -8,7 +8,7 @@
  * AnalyzeCtScanOutput - The output type for the analyzeCtScan function, including the predicted condition, confidence level, and explanation.
  */
 
-import {ai} from '@/ai/init';
+import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const AnalyzeCtScanInputSchema = z.object({
