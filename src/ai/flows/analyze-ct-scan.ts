@@ -21,24 +21,25 @@ const AnalyzeCtScanInputSchema = z.object({
 export type AnalyzeCtScanInput = z.infer<typeof AnalyzeCtScanInputSchema>;
 
 const AnalyzeCtScanOutputSchema = z.object({
-  prediction: z
-    .enum(['normal', 'abnormal'])
-    .describe('The predicted condition of the kidney.'),
   diagnosis: z
-    .enum(['none', 'cyst', 'tumor', 'stone', 'not_a_ct_scan'])
-    .describe("The specific diagnosis if the condition is 'abnormal'. If the image is not a CT scan, this will be 'not_a_ct_scan'."),
+    .enum(['normal', 'cyst', 'tumor', 'stone', 'not_a_ct_scan'])
+    .describe(
+      "The final diagnosis. If the image is not a CT scan, this will be 'not_a_ct_scan'."
+    ),
   confidence: z
     .number()
     .min(0)
     .max(1)
-    .describe('The confidence level of the prediction, ranging from 0 to 1.'),
+    .describe('The confidence level of the diagnosis, from 0 to 1.'),
   explanation: z
     .string()
-    .describe('An explanation of why the AI made this prediction.'),
+    .describe('A technical explanation for the diagnosis based on visual evidence.'),
 });
 export type AnalyzeCtScanOutput = z.infer<typeof AnalyzeCtScanOutputSchema>;
 
-export async function analyzeCtScan(input: AnalyzeCtScanInput): Promise<AnalyzeCtScanOutput> {
+export async function analyzeCtScan(
+  input: AnalyzeCtScanInput
+): Promise<AnalyzeCtScanOutput> {
   return analyzeCtScanFlow(input);
 }
 
@@ -50,60 +51,41 @@ const analyzeCtScanPrompt = ai.definePrompt({
 
 **Step 1: Image Validation**
 First, meticulously examine the image to confirm it is a valid CT scan of a human kidney.
-- If it is **NOT** a kidney CT scan, you must set 'prediction' to 'abnormal' and 'diagnosis' to 'not_a_ct_scan'. Provide a clear explanation that the image is not a kidney CT scan. Set confidence to a high value (e.g., 0.98).
+- If it is **NOT** a kidney CT scan, you must set 'diagnosis' to 'not_a_ct_scan'. Provide a clear explanation that the image is not a kidney CT scan. Set confidence to a high value (e.g., 0.98), and STOP.
 
-**Step 2: Condition Classification**
-If the image is a valid kidney CT scan, you will classify its condition.
-- If the kidney appears entirely healthy and free of anomalies, classify it as 'normal'.
-- If you detect any abnormality, classify it as 'abnormal'.
-
-**Step 3: Specific Diagnosis for Abnormal Kidneys**
-If you classified the kidney as 'abnormal' in Step 2, you must provide a specific diagnosis.
-- Choose one of the following: 'cyst', 'tumor', or 'stone'.
-- Set the 'diagnosis' field to your finding.
+**Step 2: Systematic Radiological Analysis**
+If the image is a valid kidney CT scan, you will perform a detailed analysis based on the following strict criteria. You must classify the scan into **one** of the four categories: Normal, Cyst, Tumor, or Stone.
 
 ---
+**Radiological Criteria (Analyze in this order):**
 
-**Detailed Radiological Criteria:**
+1.  **Stone (Calculus):**
+    -   **Primary Evidence:** Look for a **hyperdense (very bright white)**, well-defined object.
+    -   **Location:** Typically located within the renal pelvis or calyces (the collecting system).
+    -   **Action:** If this is present, classify as **'stone'**.
 
-You must use the following criteria for your analysis. Pay extremely close attention to the subtle differences.
+2.  **Tumor (Neoplasm):**
+    -   **Primary Evidence:** Look for a **solid, heterogeneous (non-uniform density)** mass that disrupts the kidney's smooth contour. It is not a simple fluid collection. It often shows enhancement (lights up with contrast) compared to the surrounding kidney tissue.
+    -   **Contour:** The mass often causes an abnormal bulge or irregularity on the kidney's border.
+    -   **Action:** If this is present, classify as **'tumor'**.
 
-- **Normal Kidney**:
-  - **Contour**: The kidney must have a smooth and well-defined border. There should be no bulges or irregularities.
-  - **Parenchyma (tissue)**: The tissue must be homogeneous, meaning it has a uniform appearance and density throughout. There are no focal masses, fluid collections, or bright white spots.
-  - **Collecting System**: The renal pelvis (the central collecting part) should be dark but have its characteristic branching shape, not a simple round or oval shape.
+3.  **Cyst:**
+    -   **Primary Evidence:** Look for a **well-defined, round or oval-shaped, homogeneous, low-density (dark, fluid-filled)** area.
+    -   **Wall:** It must have a very thin, almost imperceptible wall. It contains no solid components.
+    -   **Critical Distinction:** You must differentiate a simple cyst from the normal renal pelvis. The renal pelvis is part of the branching, complex collecting system. A cyst is a separate, distinct, spherical structure. If you see a dark area that is part of the branching collecting system, it is NOT a cyst.
+    -   **Action:** If a distinct, thin-walled, spherical fluid collection is present, classify as **'cyst'**.
 
-- **Cyst**:
-  - **Shape and Definition**: A simple cyst is a very well-defined, round or oval-shaped sac.
-  - **Density**: It appears as a low-density (dark), homogeneous, fluid-filled area.
-  - **Wall**: It has a very thin, almost imperceptible wall. It does not contain solid components.
-  - **Key Distinction**: It is critical to differentiate a cyst from the normal renal pelvis. A cyst is typically more spherical and is not part of the branching collecting system.
-
-- **Tumor**:
-  - **Shape and Definition**: A solid, often irregularly shaped mass that disrupts the kidney's smooth contour.
-  - **Density**: It often has a heterogeneous (non-uniform) appearance and can enhance (light up) with contrast.
-
-- **Stone**:
-  - **Density**: A very high-density (bright white), well-defined object. It is hyperdense.
-  - **Location**: Typically found within the kidney's collecting system.
-
-**Examples:**
-
-To calibrate your analysis, refer to these examples.
-
-- **Example 1: Normal Kidney**
-  - **Observation**: The image shows a kidney with a perfectly smooth contour. The parenchyma is uniform in density. The central collecting system is dark but has a normal, branching appearance. There are no round fluid collections or bright calcifications.
-  - **Conclusion**: This is a classic example of a **normal** kidney.
-
-- **Example 2: Kidney with a Cyst**
-  - **Observation**: The image shows a kidney that is mostly normal, but there is a distinct, well-defined, dark, circular area on the outer edge. This area is fluid-density and has a very thin wall. It is clearly separate from the main collecting system.
-  - **Conclusion**: This is an **abnormal** kidney with a **cyst**.
+4.  **Normal:**
+    -   **Primary Evidence:** The kidney has a smooth, well-defined contour.
+    -   **Parenchyma (tissue):** The tissue is homogeneous (uniform density) with no focal masses, no hyperdense stones, and no distinct cysts as defined above.
+    -   **Collecting System:** The renal pelvis and calyces are visible and may be dark (fluid-filled), but they have a characteristic branching, not a simple spherical, shape.
+    -   **Action:** If **none** of the criteria for Stone, Tumor, or Cyst are met, classify as **'normal'**. This is the default diagnosis if no pathology is found.
 
 ---
+**Final Output:**
+Based on your systematic analysis, provide the final diagnosis, a confidence score between 0 and 1, and a concise, technical explanation for your decision based on the visual evidence from the criteria above.
 
-Finally, provide a confidence level (0-1) for your conclusion and a brief, technical explanation for your reasoning based on the criteria above. Output your final analysis as a JSON object.
-
-Here is the CT scan image to analyze:
+CT Scan Image to analyze:
 {{media url=photoDataUri}}
     `,
 });
@@ -114,7 +96,7 @@ const analyzeCtScanFlow = ai.defineFlow(
     inputSchema: AnalyzeCtScanInputSchema,
     outputSchema: AnalyzeCtScanOutputSchema,
   },
-  async input => {
+  async (input) => {
     const {output} = await analyzeCtScanPrompt(input);
     return output!;
   }

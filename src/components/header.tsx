@@ -10,7 +10,7 @@ export function Header() {
         <Link href="/" className="flex items-center gap-2 group">
           <Icons.logo className="h-8 w-8 text-primary transition-transform group-hover:scale-110" />
           <span className="font-bold text-lg sm:text-xl font-headline group-hover:text-primary transition-colors">
-            KidneyScan Analyzer
+            KidneyScan AI
           </span>
         </Link>
         <nav>

@@ -4,31 +4,18 @@ import {
   analyzeCtScan,
   type AnalyzeCtScanOutput,
 } from "@/ai/flows/analyze-ct-scan";
-import { generatePredictionExplanation } from "@/ai/flows/generate-prediction-explanation";
 
 export interface FullAnalysisResult extends AnalyzeCtScanOutput {
-  highlightedAreas?: string;
+  // This interface can be extended in the future if needed
 }
 
 export async function analyzeScanAction(
   photoDataUri: string
 ): Promise<{ success: boolean; data?: FullAnalysisResult; error?: string }> {
   try {
-    const initialResult = await analyzeCtScan({ photoDataUri });
+    const result = await analyzeCtScan({ photoDataUri });
 
-    const explanationResult = await generatePredictionExplanation({
-      imageUri: photoDataUri,
-      condition: initialResult.prediction === 'normal' ? 'normal' : initialResult.diagnosis,
-      confidence: initialResult.confidence,
-    });
-
-    const fullResult: FullAnalysisResult = {
-      ...initialResult,
-      explanation: explanationResult.explanation, // Overwrite with the more detailed explanation
-      highlightedAreas: explanationResult.highlightedAreas,
-    };
-
-    return { success: true, data: fullResult };
+    return { success: true, data: result };
   } catch (error) {
     console.error("Error analyzing CT scan:", error);
     let errorMessage = "An unknown error occurred during analysis.";

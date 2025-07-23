@@ -26,7 +26,6 @@ import {
   Bot,
   FileImage,
   Sparkles,
-  Search,
 } from "lucide-react";
 
 type AnalysisState =
@@ -48,7 +47,6 @@ export default function Home() {
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Basic validation for image types
       if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
         toast({
           variant: "destructive",
@@ -101,19 +99,16 @@ export default function Home() {
     });
   };
 
-  const capitalized = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+  const capitalized = (s: string) => {
+    if (!s) return "";
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
 
-  const getDisplayPrediction = (result: FullAnalysisResult) => {
+  const getDisplayDiagnosis = (result: FullAnalysisResult) => {
     if (result.diagnosis === 'not_a_ct_scan') {
       return 'Not a CT Scan';
     }
-    if (result.prediction === 'normal') {
-      return 'Normal';
-    }
-    if (result.diagnosis && result.diagnosis !== 'none') {
-      return capitalized(result.diagnosis);
-    }
-    return capitalized(result.prediction);
+    return capitalized(result.diagnosis);
   }
 
   return (
@@ -210,46 +205,29 @@ export default function Home() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <Label>Prediction</Label>
+              <Label>Diagnosis</Label>
               <p className="text-2xl font-bold font-headline">
-                {getDisplayPrediction(result)}
+                {getDisplayDiagnosis(result)}
               </p>
             </div>
-            {result.diagnosis !== 'not_a_ct_scan' && (
-              <>
-                <div>
-                  <Label>Confidence</Label>
-                  <div className="flex items-center gap-4">
-                    <Progress value={result.confidence * 100} className="w-full" />
-                    <span className="font-bold text-lg">
-                      {Math.round(result.confidence * 100)}%
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <Label>Explanation</Label>
-                  <p className="text-muted-foreground">{result.explanation}</p>
-                </div>
-                {result.highlightedAreas && (
-                  <div>
-                    <Label className="flex items-center gap-2">
-                      <Search className="h-4 w-4" /> Areas of Note
-                    </Label>
-                    <p className="text-muted-foreground">{result.highlightedAreas}</p>
-                  </div>
-                )}
-              </>
-            )}
-            {result.diagnosis === 'not_a_ct_scan' && (
-               <div>
-                  <Label>Explanation</Label>
-                  <p className="text-muted-foreground">{result.explanation}</p>
-                </div>
-            )}
+            
+            <div>
+              <Label>Confidence</Label>
+              <div className="flex items-center gap-4">
+                <Progress value={result.confidence * 100} className="w-full" />
+                <span className="font-bold text-lg">
+                  {Math.round(result.confidence * 100)}%
+                </span>
+              </div>
+            </div>
+            <div>
+              <Label>Explanation</Label>
+              <p className="text-muted-foreground">{result.explanation}</p>
+            </div>
           </CardContent>
           <CardFooter className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-muted/50 p-4 rounded-b-lg">
             <p className="text-sm text-muted-foreground">
-              Was this prediction helpful?
+              Was this diagnosis helpful?
             </p>
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={handleFeedback}>
