@@ -3,13 +3,13 @@
 /**
  * @fileOverview This file defines the Genkit flow for analyzing kidney CT scan images to predict potential conditions.
  *
- * analyzeCtScan - An async function that takes a CT scan image data URI and returns a prediction with confidence and explanation.
+ * analyzeCtScanFlow - An async function that takes a CT scan image data URI and returns a prediction with confidence and explanation.
  * AnalyzeCtScanInput - The input type for the analyzeCtscan function, which is a data URI of the CT scan image.
  * AnalyzeCtScanOutput - The output type for the analyzeCtScan function, including the predicted condition, confidence level, and explanation.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'zod';
 
 const AnalyzeCtScanInputSchema = z.object({
   photoDataUri: z
@@ -34,16 +34,10 @@ const AnalyzeCtScanOutputSchema = z.object({
 });
 export type AnalyzeCtScanOutput = z.infer<typeof AnalyzeCtScanOutputSchema>;
 
-export async function analyzeCtScan(
-  input: AnalyzeCtScanInput
-): Promise<AnalyzeCtScanOutput> {
-  return analyzeCtScanFlow(input);
-}
-
 const analyzeCtScanPrompt = ai.definePrompt({
   name: 'analyzeCtScanPrompt',
-  input: {schema: AnalyzeCtScanInputSchema},
-  output: {schema: AnalyzeCtScanOutputSchema},
+  input: { schema: AnalyzeCtScanInputSchema },
+  output: { schema: AnalyzeCtScanOutputSchema },
   prompt: `You are a world-class radiologist AI specializing in kidney CT scans. Your task is to analyze the provided image with the highest degree of accuracy, following a strict, systematic process.
 
 **Step 1: Image Validation**
@@ -87,14 +81,14 @@ CT Scan Image to analyze:
     `,
 });
 
-const analyzeCtScanFlow = ai.defineFlow(
+export const analyzeCtScanFlow = ai.defineFlow(
   {
     name: 'analyzeCtScanFlow',
     inputSchema: AnalyzeCtScanInputSchema,
     outputSchema: AnalyzeCtScanOutputSchema,
   },
   async (input) => {
-    const {output} = await analyzeCtScanPrompt(input);
+    const { output } = await analyzeCtScanPrompt(input);
     return output!;
   }
 );

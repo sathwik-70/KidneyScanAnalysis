@@ -3,13 +3,13 @@
 /**
  * @fileOverview AI flow for generating human-readable explanations for kidney condition predictions.
  *
- * - generatePredictionExplanation - A function that generates explanations for kidney condition predictions.
+ * - generatePredictionExplanationFlow - A function that generates explanations for kidney condition predictions.
  * - GeneratePredictionExplanationInput - The input type for the generatePredictionExplanation function.
  * - GeneratePredictionExplanationOutput - The return type for the generatePredictionExplanation function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'zod';
 
 const GeneratePredictionExplanationInputSchema = z.object({
   imageUri: z
@@ -26,10 +26,6 @@ const GeneratePredictionExplanationOutputSchema = z.object({
   explanation: z.string().describe('A human-readable explanation for the prediction, written for a patient to understand.'),
 });
 export type GeneratePredictionExplanationOutput = z.infer<typeof GeneratePredictionExplanationOutputSchema>;
-
-export async function generatePredictionExplanation(input: GeneratePredictionExplanationInput): Promise<GeneratePredictionExplanationOutput> {
-  return generatePredictionExplanationFlow(input);
-}
 
 const prompt = ai.definePrompt({
   name: 'generatePredictionExplanationPrompt',
@@ -60,13 +56,13 @@ Write a short, easy-to-understand explanation for the patient based on the AI's 
 Generate the explanation now.`,
 });
 
-const generatePredictionExplanationFlow = ai.defineFlow(
+export const generatePredictionExplanationFlow = ai.defineFlow(
   {
     name: 'generatePredictionExplanationFlow',
     inputSchema: GeneratePredictionExplanationInputSchema,
     outputSchema: GeneratePredictionExplanationOutputSchema,
   },
-  async input => {
+  async (input) => {
     const {output} = await prompt(input);
     return output!;
   }
