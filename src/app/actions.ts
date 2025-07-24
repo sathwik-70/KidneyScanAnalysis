@@ -39,7 +39,7 @@ const analyzeAndExplainCtScanPrompt = ai.definePrompt({
     }),
   },
   output: { schema: FullAnalysisResultSchema },
-  model: 'googleai/gemini-1.5-pro-latest',
+  model: 'googleai/gemini-1.5-flash-latest',
   prompt: `You are a world-class radiologist AI specializing in kidney CT scans. Your task is to analyze the provided image with the highest degree of accuracy and then provide a clear, patient-friendly explanation. You must output a single JSON object with 'diagnosis', 'confidence', and 'explanation'.
 
 **Step 1: Image Validation**
