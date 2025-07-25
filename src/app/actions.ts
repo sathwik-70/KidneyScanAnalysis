@@ -1,3 +1,4 @@
+
 'use server';
 
 import { ai } from '@/ai/genkit';
@@ -40,34 +41,30 @@ const analyzeAndExplainCtScanPrompt = ai.definePrompt({
   },
   output: { schema: FullAnalysisResultSchema },
   model: 'googleai/gemini-1.5-flash-latest',
-  prompt: `You are a world-class radiologist AI. Your task is to analyze the provided image with the highest degree of accuracy and provide a patient-friendly explanation. You will output a single JSON object with 'diagnosis', 'confidence', and 'explanation'.
+  prompt: `You are a world-class radiologist AI. Your task is to analyze the provided image and give the single most accurate diagnosis. You will output a single JSON object with 'diagnosis', 'confidence', and 'explanation'.
 
-**Step 1: Image Validation**
-First, confirm the image is a valid CT scan of a human kidney. If not, set 'diagnosis' to 'not_a_ct_scan', 'confidence' to 0.99, and 'explanation' to 'The uploaded image does not appear to be a valid CT scan of a kidney. Please upload a relevant medical image for analysis.', then STOP.
+Follow these rules STRICTLY to determine the diagnosis:
 
-**Step 2: Evidence-Based Differential Diagnosis**
-If the image is a valid kidney CT scan, you must perform a holistic analysis before reaching a conclusion. Do NOT stop at the first finding. Identify evidence for ALL of the following conditions.
+1.  **IMAGE VALIDATION:** First, verify the image is a CT scan of a human kidney. If not, the diagnosis MUST be 'not_a_ct_scan'. STOP HERE.
 
-*   **Evidence for Stone (Calculus):** Look for a *hyperdense (very bright white), distinct, and well-circumscribed object*, typically located in the collecting system (renal pelvis or calyces). It should not significantly disrupt the kidney's overall shape.
-*   **Evidence for Tumor (Neoplasm):** Look for a *solid mass* that disrupts the kidney's normal smooth contour. Critically, tumors are often *heterogeneous* (have varied density) and can show enhancement. A tumor may contain bright spots (calcifications or vessels), but the primary feature is the presence of a solid, space-occupying tissue mass.
-*   **Evidence for Cyst:** Look for a *well-defined, round, homogeneous, low-density (dark, fluid-filled)* area with a very thin, almost imperceptible wall. It does not contain solid tissue.
+2.  **DIAGNOSTIC HIERARCHY:** If the image is a valid CT scan, you must evaluate for the following conditions in this exact order.
 
-**Step 3: Final Classification Logic**
-After gathering all evidence, apply the following rules to determine the SINGLE correct diagnosis:
+    -   **Rule A: Check for a TUMOR.**
+        -   **Evidence:** Look for a SOLID, space-occupying MASS that disrupts the normal, smooth contour of the kidney. Tumors are often HETEROGENEOUS (have varied density) and may contain bright spots (calcifications) or dark spots (necrosis).
+        -   **Decision:** If a solid mass is present, the diagnosis MUST be 'tumor', regardless of any other findings. This is the most critical rule. STOP HERE.
 
-1.  **Tumor Overrides Stone:** If you find evidence of a solid, heterogeneous mass (Tumor criteria), even if it contains hyperdense spots, you **MUST** classify it as **'tumor'**. The presence of a mass is the dominant finding. Do not classify it as 'stone'.
-2.  **Stone Classification:** Only classify as **'stone'** if you see a distinct, hyperdense object *without* an associated solid, heterogeneous tissue mass.
-3.  **Cyst Classification:** Only classify as **'cyst'** if a fluid-filled sac is present and there is **NO** evidence of a solid tumor or a stone.
-4.  **Normal Classification:** Only classify as **'normal'** if there is no evidence for a tumor, stone, or cyst.
+    -   **Rule B: Check for a STONE.**
+        -   **Evidence:** Only if NO tumor is found, look for a HYPERDENSE (very bright white), distinct, well-circumscribed OBJECT. A stone is an object, NOT a large tissue mass. It does not significantly disrupt the kidney's overall shape.
+        -   **Decision:** If a stone is present (and no tumor was found), the diagnosis MUST be 'stone'. STOP HERE.
 
-**Step 4: Generate Explanation**
-Based on your final diagnosis, provide a clear, patient-friendly explanation.
-*   **If Tumor:** Explain that there is an area of unusual tissue growth that requires immediate medical attention. Stress the importance of discussing the findings with a doctor for further evaluation.
-*   **If Stone:** Explain that the scan shows a dense spot characteristic of a kidney stone and advise consulting a doctor.
-*   **If Cyst:** Explain that it's a simple, fluid-filled sac, which is often benign, but a doctor should confirm.
-*   **If Normal:** Reassure the patient that the scan appears to show no clear signs of common issues.
+    -   **Rule C: Check for a CYST.**
+        -   **Evidence:** Only if NO tumor or stone is found, look for a well-defined, round, HOMOGENEOUS, LOW-DENSITY (dark, fluid-filled) area with a very thin wall. It contains NO solid tissue.
+        -   **Decision:** If a cyst is present (and no tumor or stone was found), the diagnosis MUST be 'cyst'. STOP HERE.
 
-Provide the final JSON output based on your rigorous analysis.
+    -   **Rule D: NORMAL.**
+        -   **Decision:** If the criteria for Tumor, Stone, or Cyst are NOT met, the diagnosis MUST be 'normal'.
+
+3.  **GENERATE EXPLANATION:** Based on your final diagnosis, provide a clear, patient-friendly explanation.
 
 CT Scan Image to analyze:
 {{media url=photoDataUri}}
@@ -96,9 +93,7 @@ export async function analyzeScanAction(
   photoDataUri: string
 ): Promise<{ success: boolean; data?: FullAnalysisResult; error?: string }> {
   try {
-    // A single, unified call to the AI flow
     const result = await analyzeAndExplainCtScanFlow({ photoDataUri });
-
     return { success: true, data: result };
   } catch (error) {
     console.error('Error analyzing CT scan:', error);
@@ -106,7 +101,6 @@ export async function analyzeScanAction(
     if (error instanceof Error) {
       errorMessage = error.message;
     }
-    // Return a user-friendly error message
     return {
       success: false,
       error: `Failed to analyze the image. Please try again. The AI model may be temporarily unavailable.`,
