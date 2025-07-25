@@ -47,35 +47,34 @@ First, meticulously examine the image to confirm it is a valid CT scan of a huma
 - If it is **NOT** a kidney CT scan, you must set 'diagnosis' to 'not_a_ct_scan', 'confidence' to a high value (e.g., 0.98), and 'explanation' to 'The uploaded image does not appear to be a valid CT scan of a kidney. Please upload a relevant medical image for analysis.', then STOP.
 
 **Step 2: Systematic Radiological Analysis & Explanation Generation**
-If the image is a valid kidney CT scan, perform a detailed analysis based on the following strict criteria. You must classify the scan into **one** of the four categories: Normal, Cyst, Tumor, or Stone. After determining the diagnosis, generate the explanation.
+If the image is a valid kidney CT scan, you must perform a detailed analysis based on the following strict, hierarchical criteria. You must classify the scan into **one** of the four categories: Normal, Cyst, Tumor, or Stone. The order of analysis is critical.
 
 ---
-**Radiological Criteria (Analyze in this order):**
+**Radiological Criteria (Analyze in this exact order and stop when a positive finding is made):**
 
-1.  **Stone (Calculus):**
-    -   **Primary Evidence:** Look for a **hyperdense (very bright white)**, well-defined object, typically within the renal pelvis or calyces.
-    -   **Action:** If present, classify as **'stone'**.
-    -   **Explanation:** Explain that the scan shows a small, dense spot characteristic of a kidney stone and advise the user to consult their doctor.
+1.  **Analyze for Stone (Calculus):**
+    -   **Evidence:** Look for a **hyperdense (very bright white)**, well-defined object, typically within the renal pelvis or calyces.
+    -   **Action:** If present, you **must** classify as **'stone'** and proceed to generate the explanation. Do not consider other diagnoses.
+    -   **Explanation (if stone):** Explain that the scan shows a small, dense spot characteristic of a kidney stone and advise the user to consult their doctor for confirmation and treatment options.
 
-2.  **Tumor (Neoplasm):**
-    -   **Primary Evidence:** Look for a **solid, heterogeneous (non-uniform density)** mass that disrupts the kidney's smooth contour. It is not a simple fluid collection and often shows enhancement with contrast.
-    -   **Action:** If present, classify as **'tumor'**.
-    -   **Explanation:** Explain that there is an area with unusual tissue growth that may indicate a tumor and stress the importance of discussing the findings with a doctor for further evaluation.
+2.  **Analyze for Tumor (Neoplasm):**
+    -   **Evidence:** Only if no stone is found, look for a **solid, heterogeneous (non-uniform density)** mass that disrupts the kidney's normal smooth contour. It is not a simple fluid collection and may show enhancement.
+    -   **Action:** If present, you **must** classify as **'tumor'** and proceed to generate the explanation. Do not classify it as a cyst or normal.
+    -   **Explanation (if tumor):** Explain that there is an area of unusual tissue growth that requires immediate medical attention. Stress the importance of discussing the findings with a doctor for further evaluation, such as a biopsy.
 
-3.  **Cyst:**
-    -   **Primary Evidence:** Look for a **well-defined, round, homogeneous, low-density (dark, fluid-filled)** area with a very thin wall.
-    -   **Critical Distinction:** Differentiate this from the normal renal pelvis, which is a branching structure. A cyst is a separate, spherical structure.
-    -   **Action:** If a distinct cyst is present, classify as **'cyst'**.
-    -   **Explanation:** Explain that the scan shows a simple, fluid-filled sac known as a cyst, which is often benign, but that a doctor should confirm the diagnosis.
+3.  **Analyze for Cyst:**
+    -   **Evidence:** Only if no stone or tumor is found, look for a **well-defined, round, homogeneous, low-density (dark, fluid-filled)** area with a very thin, almost imperceptible wall.
+    -   **Action:** If a simple cyst is present, classify as **'cyst'** and proceed to generate the explanation.
+    -   **Explanation (if cyst):** Explain that the scan shows a simple, fluid-filled sac known as a cyst, which is often benign, but that a doctor should confirm the diagnosis.
 
-4.  **Normal:**
-    -   **Primary Evidence:** Smooth kidney contour, homogeneous tissue, and no signs matching the criteria for stone, tumor, or cyst.
+4.  **Classify as Normal:**
+    -   **Evidence:** Only if **no evidence** for a stone, tumor, or cyst is found after systematically checking for each. The kidney must have a smooth contour and homogeneous tissue density throughout.
     -   **Action:** If no pathology is found, classify as **'normal'**.
-    -   **Explanation:** Reassure the patient that the scan appears normal, showing the kidney has a standard size and shape with no clear signs of common issues like stones, cysts, or tumors.
+    -   **Explanation (if normal):** Reassure the patient that the scan appears normal, showing the kidney has a standard size and shape with no clear signs of common issues like stones, cysts, or tumors. Advise them to continue with regular check-ups as recommended by their doctor.
 
 ---
 **Final Output:**
-Based on your systematic analysis, provide the final JSON object containing 'diagnosis', 'confidence' (a score between 0 and 1), and the corresponding 'explanation'.
+Based on your strict, hierarchical analysis, provide the final JSON object containing 'diagnosis', 'confidence' (your confidence score in the classification from 0.0 to 1.0), and the corresponding 'explanation'.
 
 CT Scan Image to analyze:
 {{media url=photoDataUri}}
@@ -90,7 +89,10 @@ const analyzeAndExplainCtScanFlow = ai.defineFlow(
   },
   async (input) => {
     const { output } = await analyzeAndExplainCtScanPrompt(input);
-    return output!;
+    if (!output) {
+      throw new Error('AI analysis returned no result.');
+    }
+    return output;
   }
 );
 
@@ -103,10 +105,6 @@ export async function analyzeScanAction(
   try {
     // A single, unified call to the AI flow
     const result = await analyzeAndExplainCtScanFlow({ photoDataUri });
-
-    if (!result) {
-      throw new Error('AI analysis returned no result.');
-    }
 
     return { success: true, data: result };
   } catch (error) {
