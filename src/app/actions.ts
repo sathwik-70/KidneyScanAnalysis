@@ -58,7 +58,7 @@ If the image is a valid kidney CT scan, you must perform a detailed analysis bas
     -   **Explanation (if stone):** Explain that the scan shows a small, dense spot characteristic of a kidney stone and advise the user to consult their doctor for confirmation and treatment options.
 
 2.  **Analyze for Tumor (Neoplasm):**
-    -   **Evidence:** Only if no stone is found, look for a **solid, heterogeneous (non-uniform density)** mass that disrupts the kidney's normal smooth contour. It is not a simple fluid collection and may show enhancement.
+    -   **Evidence:** Only if no stone is found, look for a **solid, heterogeneous (non-uniform density) mass** that disrupts the kidney's normal smooth contour. It is not a simple fluid collection and may show enhancement.
     -   **Action:** If present, you **must** classify as **'tumor'** and proceed to generate the explanation. Do not classify it as a cyst or normal.
     -   **Explanation (if tumor):** Explain that there is an area of unusual tissue growth that requires immediate medical attention. Stress the importance of discussing the findings with a doctor for further evaluation, such as a biopsy.
 
