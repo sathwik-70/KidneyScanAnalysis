@@ -92,7 +92,7 @@ const analyzeAndExplainCtScanFlow = ai.defineFlow(
 
 export async function analyzeScanAction(
   photoDataUri: string
-): Promise<{ success: boolean; data?: Full.AnalysisResult; error?: string }> {
+): Promise<{ success: boolean; data?: FullAnalysisResult; error?: string }> {
   try {
     const result = await analyzeAndExplainCtScanFlow({ photoDataUri });
     return { success: true, data: result };
