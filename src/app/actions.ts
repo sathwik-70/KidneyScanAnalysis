@@ -40,7 +40,7 @@ const analyzeAndExplainCtScanPrompt = ai.definePrompt({
     }),
   },
   output: { schema: FullAnalysisResultSchema },
-  model: 'googleai/gemini-1.5-flash-latest',
+  model: 'googleai/gemini-1.5-pro-latest',
   prompt: `You are a world-class radiologist AI. Your task is to analyze the provided kidney CT scan and determine the single most accurate diagnosis. You will output a single JSON object with 'diagnosis', 'confidence', and 'explanation'.
 
 Follow these rules STRICTLY to determine the diagnosis:
@@ -50,7 +50,7 @@ Follow these rules STRICTLY to determine the diagnosis:
 2.  **DIAGNOSTIC HIERARCHY:** If the image is a valid CT scan, you must evaluate for the following conditions in this exact order. Your primary goal is to avoid misclassifying a tumor.
 
     -   **Rule A: Check for a TUMOR first.**
-        -   **Evidence:** Look for a **distinct, focal, solid mass** that has a different tissue density (enhancement) than the surrounding normal kidney tissue. A tumor is a **space-occupying lesion** that **clearly disrupts and deforms the expected smooth, bean-like outline of the kidney**. It is NOT a subtle or gentle bulge. Normal anatomical variations (like a dromedary hump or fetal lobulations) should NOT be classified as a tumor. Tumors can be heterogeneous and may contain hyperdense (bright) areas, which are calcifications within the tumor, not separate stones.
+        -   **Evidence:** Look for a **distinct, focal, SOLID MASS** that has a different tissue density (enhancement) than the surrounding normal kidney tissue. A tumor is a **space-occupying lesion** that **clearly disrupts and deforms the expected smooth, bean-like outline of the kidney**. It is NOT a subtle or gentle bulge. Normal anatomical variations (like a dromedary hump or fetal lobulations) should NOT be classified as a tumor. Tumors can be heterogeneous and may contain hyperdense (bright) areas, which are calcifications within the tumor, not separate stones.
         -   **Decision:** If you are highly confident a solid mass that deforms the kidney contour is present, the diagnosis MUST be 'tumor', regardless of any other findings. This is the most critical rule. STOP HERE.
 
     -   **Rule B: Check for a STONE.**
