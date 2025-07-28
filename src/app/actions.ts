@@ -70,6 +70,14 @@ Follow these rules STRICTLY to determine the diagnosis:
 CT Scan Image to analyze:
 {{media url=photoDataUri}}
     `,
+    config: {
+        safetySettings: [
+          {
+            category: 'HARM_CATEGORY_DANGEROUS_CONTENT',
+            threshold: 'BLOCK_NONE',
+          },
+        ],
+    },
 });
 
 const analyzeAndExplainCtScanFlow = ai.defineFlow(
